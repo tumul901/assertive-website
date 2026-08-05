@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { Reveal } from "@/components/ui/Reveal";
+import { CardStack } from "@/components/ui/CardStack";
 import { PILLARS, type Pillar } from "@/lib/data/pillars";
 
 /*
@@ -60,13 +60,16 @@ export function Pillars() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {PILLARS.map((pillar, i) => (
-            <Reveal key={pillar.id} delay={i * 0.08}>
-              <PillarCard pillar={pillar} />
-            </Reveal>
+        {/* CardStack owns the entrance: below xl it is the same staggered
+            Reveal these cards always had, and at xl the five arrive as a
+            fanned deck on the centre line and pop outward. The grid
+            classes stay here because the layout is this section's business
+            and the stack reads its columns back off the DOM. */}
+        <CardStack className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {PILLARS.map((pillar) => (
+            <PillarCard key={pillar.id} pillar={pillar} />
           ))}
-        </div>
+        </CardStack>
       </Container>
     </Section>
   );
