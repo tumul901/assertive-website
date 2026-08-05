@@ -201,7 +201,7 @@ export function WhatsAppWidget() {
         // reachable by Tab while the panel is shut.
         aria-hidden={!open}
         inert={!open}
-        className={`pointer-events-auto flex w-[min(360px,calc(100vw-2rem))] origin-bottom-right flex-col overflow-hidden rounded-2xl border shadow-[0_18px_50px_-12px_rgb(0_0_0/0.55)] transition-[opacity,transform] duration-[var(--dur-base)] ease-out-expo ${
+        className={`pointer-events-auto flex w-[min(360px,calc(100vw-2rem))] origin-bottom-right flex-col overflow-hidden rounded-2xl border shadow-[0_18px_50px_-12px_rgb(0_0_0/0.55)] transition-[opacity,translate,scale] duration-[var(--dur-base)] ease-out-expo ${
           open
             ? "translate-y-0 scale-100 opacity-100"
             : "pointer-events-none translate-y-4 scale-95 opacity-0"

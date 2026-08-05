@@ -81,18 +81,34 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
     <Link
       href={`/services#${pillar.id}`}
       /*
-       * ease-OUT, not the --ease-in-out token. That token is
-       * cubic-bezier(0.65, 0, 0.35, 1) - a slow start - and on a hover it
-       * reads as lag rather than softness: the card sits still for the
-       * first ~100ms after the pointer lands. An ease-out leaves
-       * immediately and settles slowly, which is the shape "soft" actually
-       * describes. Same curve on the way back down.
+       * TRANSITION `translate` AND `scale`, NOT `transform`. Tailwind v4
+       * builds -translate-y-* and scale-* out of the DISCRETE CSS
+       * properties (`translate: x y`, `scale: n`), not the transform
+       * shorthand - v4's own transition-transform utility gives itself
+       * away here, expanding to `transform, translate, scale, rotate`. An
+       * arbitrary list is taken literally, so naming only `transform` in
+       * one names a property that never changes: the lift lands in a
+       * single frame while the shadow alone eases. Verified against the
+       * built CSS, not assumed. If a plain `transform` ever does appear on
+       * this element - an inline style, say - it has to join the list.
        *
-       * The lift lives on this <a>, while CardStack drives the wrapper
-       * around it, so the two transforms compose instead of fighting - the
-       * deck can be mid-pop and a card can still be hovered.
+       * Do not write a bracketed utility out in full in a comment here.
+       * The v4 scanner reads raw file text and cannot tell prose from
+       * markup, so an example in a sentence is compiled into a real (dead)
+       * rule. One of those shipped before this note was added.
+       *
+       * ease-OUT, not the --ease-in-out token: that one is
+       * cubic-bezier(0.65, 0, 0.35, 1), a slow START, which on a hover
+       * reads as lag rather than softness - the card sits still for the
+       * first ~100ms after the pointer lands. Out leaves immediately and
+       * settles slowly, which is the shape "soft" actually describes, and
+       * it runs the same way back down.
+       *
+       * The lift is on this <a> while CardStack drives the wrapper around
+       * it, so the two compose instead of fighting: the deck can be
+       * mid-pop and a card can still be hovered.
        */
-      className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-surface-raised shadow-card transition-[transform,box-shadow] duration-[var(--dur-base)] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-card-hover focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:!transform-none"
+      className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-surface-raised shadow-card transition-[translate,scale,box-shadow] duration-[var(--dur-base)] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-card-hover focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:!translate-none motion-reduce:!scale-100"
       style={{ outlineColor: `var(--color-${pillar.id}-ink)` }}
     >
       <span className={`h-1 w-full shrink-0 ${pillar.mark}`} aria-hidden="true" />
