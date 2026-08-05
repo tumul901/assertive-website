@@ -1,0 +1,372 @@
+/*
+ * IMPORTANT - read before adding tokens here.
+ *
+ * Tailwind v4 @theme block is tree-shaken by usage: a key only survives
+ * into compiled CSS once something references the utility class it maps
+ * to (or references the variable directly in hand-written CSS). This was
+ * verified empirically in Phase 1. See PLAN.md section 0.2 item 5.
+ *
+ * So this file has two sections:
+ *   1. @theme  - tokens that map to a real Tailwind namespace (--color-*,
+ *      --text-*, --radius-*, --shadow-*, --ease-*). These auto-generate
+ *      utility classes (bg-corporate-fill, text-display, rounded-lg,
+ *      shadow-card, ease-out-expo, etc) once a component uses them, and
+ *      Tailwind keeps the backing variable automatically from then on.
+ *   2. plain :root - tokens with no Tailwind namespace to hook into
+ *      (there is no themeable duration scale in Tailwind v4; --dur-* is
+ *      not a recognized prefix). Plain :root is never tree-shaken, so
+ *      these are always present regardless of whether anything uses
+ *      them yet. Required for the durations, which Motion reads as
+ *      plain JS numbers anyway, and for the hue reference angles.
+ *
+ * Do not move a section-2 token from one block to the other without
+ * re-running the Phase 1 token-coverage check (verify-phase1.cjs
+ * pattern) - it is easy to silently reintroduce the tree-shaking
+ * problem.
+ *
+ * Also avoid apostrophes and backticks inside comments in this file.
+ * An apostrophe in a comment previously broke the Tailwind v4 CSS
+ * parser with "Unterminated string" and took the whole dev server
+ * down (CssSyntaxError from @tailwindcss/postcss). Plain ASCII only.
+ *
+ * Each --text-* entry below carries a FULL cluster via Tailwind v4s
+ * companion-key convention: --text-NAME sets font-size, and
+ * --text-NAME--line-height / --letter-spacing / --font-weight ride
+ * along automatically whenever the text-NAME utility is used (verified
+ * against the compiled engine, node_modules/tailwindcss/dist/lib.js,
+ * which recognizes all three suffixes). One class applies all four
+ * properties at once.
+ *
+ * CONSEQUENCE - do not stack a font-weight utility (font-medium,
+ * font-semibold, ...) on an element that already has one of these
+ * text-* classes: the two rules have equal CSS specificity and Tailwind
+ * does not guarantee your className order wins, so the result is
+ * unpredictable. If a component needs a size role at a DIFFERENT
+ * weight than its token default (e.g. a nav label at 1rem/500 instead
+ * of text-bodys baked-in 1rem/400), compose Tailwinds own built-in
+ * size utility instead of the custom one - text-base (not text-body),
+ * text-sm (not text-small) - paired with the explicit font-weight
+ * utility you want. text-base and text-sm carry no companion keys of
+ * their own, so there is nothing to conflict with. This is why you
+ * will see both text-body and text-base used for visually-identical
+ * 16px text in this codebase - it is deliberate, not an inconsistency.
+ *
+ * A SECOND, MORE DANGEROUS pitfall with these same custom text-* names:
+ * tailwind-merge (inside this codebases cn() helper, src/lib/utils.ts)
+ * does not know text-display/text-h2/text-h3/text-body/text-body-lg/
+ * text-small/text-eyebrow are font-size tokens. Its conflict-detection
+ * pattern-matches text-{word}, and for any word it does not recognize
+ * from Tailwinds own default size scale (xs, sm, base, lg, xl, 2xl...)
+ * it falls back to assuming a text-COLOR utility. So cn("text-eyebrow",
+ * "text-ink-muted") sees what it thinks are two text-color utilities in
+ * the same conflict group and SILENTLY DROPS ONE - no warning, no error,
+ * the class just is not there. This actually happened during Phase 3
+ * build (Eyebrow.tsx rendered with text-ink-muted but no text-eyebrow at
+ * all - caught only by inspecting the rendered DOM, not by any type or
+ * build error).
+ *
+ * RULE: never pass one of these seven custom text-* names through cn()
+ * alongside a text-color utility. Concatenate it OUTSIDE cn()s scope
+ * instead:
+ *
+ *   BROKEN:  cn("text-eyebrow text-ink-muted", className)
+ *   FIXED:   `text-eyebrow ${cn("text-ink-muted", className)}`
+ *
+ * text-base and text-sm (Tailwinds own built-ins, see the paragraph
+ * above) do not have this problem either - tailwind-merge recognizes
+ * them correctly as the font-size group, distinct from text-color. Only
+ * the seven CUSTOM names need the manual-concatenation workaround.
+ */
+
+@theme {
+  /* ---- neutrals ---- */
+  --color-surface: oklch(94.5% 0.01 72);
+  --color-surface-raised: oklch(96.1% 0.007 76);
+  --color-ink: oklch(0% 0 0);
+  --color-ink-body: oklch(40.2% 0.008 234);
+  --color-ink-muted: oklch(44.3% 0.007 275);
+  --color-hairline: oklch(88% 0.01 75);
+
+  /* ---- ink role: icons and coloured text, target 4.5:1 on surface ---- */
+  --color-activation-ink: oklch(54.9% 0.16 26);
+  --color-content-ink: oklch(53.2% 0.109 79);
+  --color-live-ink: oklch(51.5% 0.155 146);
+  --color-corporate-ink: oklch(52.2% 0.094 220);
+  --color-weddings-ink: oklch(54.8% 0.16 314);
+
+  /* ---- fill role: solid buttons, white label target 4.5:1 ---- */
+  --color-activation-fill: oklch(58.8% 0.16 26);
+  --color-content-fill: oklch(57.2% 0.117 79);
+  --color-live-fill: oklch(55.3% 0.16 146);
+  --color-corporate-fill: oklch(56% 0.1 220);
+  --color-weddings-fill: oklch(58.7% 0.16 314);
+
+  /* ---- mark role: decorative rules, target 3:1 ---- */
+  --color-activation-mark: oklch(65.2% 0.2 26);
+  --color-content-mark: oklch(63.3% 0.129 79);
+  --color-live-mark: oklch(61.1% 0.183 146);
+  --color-corporate-mark: oklch(61.9% 0.111 220);
+  --color-weddings-mark: oklch(65.1% 0.2 314);
+
+  /* ---- wash role: tinted section backgrounds ---- */
+  --color-activation-wash: oklch(96.2% 0.022 26);
+  --color-content-wash: oklch(96.2% 0.022 79);
+  --color-live-wash: oklch(96.2% 0.022 146);
+  --color-corporate-wash: oklch(96.2% 0.022 220);
+  --color-weddings-wash: oklch(96.2% 0.022 314);
+
+  /* ---- easing: Tailwind own --ease-* namespace. --ease-in-out here
+     intentionally overrides the stock Tailwind value with ours. ---- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---- radius: also overrides stock Tailwind --radius-sm/md/lg ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* ---- elevation ---- */
+  --shadow-card:
+    0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -8px rgb(0 0 0 / 0.08);
+  --shadow-card-hover:
+    0 2px 4px rgb(0 0 0 / 0.05), 0 16px 40px -12px rgb(0 0 0 / 0.14);
+  --shadow-bar:
+    0 2px 8px rgb(0 0 0 / 0.05), 0 24px 48px -20px rgb(0 0 0 / 0.12);
+
+  /* ---- type scale ----
+     Font families are not theme tokens. next/font/google injects
+     --font-display and --font-body directly on the html element (see
+     layout.tsx), and globals.css applies them with plain font-family
+     rules. These --text-* keys ARE in the real Tailwind --text-*
+     namespace, so text-display becomes a real utility class - and each
+     one carries the FULL cluster (size, line-height, letter-spacing,
+     font-weight) via Tailwind v4's --text-{name}--{property} companion
+     keys, confirmed present in the compiled engine
+     (node_modules/tailwindcss/dist/lib.js). Applying just the one
+     class, e.g. text-display, sets all four properties at once - do
+     not also apply a separate font-bold/tracking-* utility alongside
+     these, that would be redundant with what the token already sets. */
+  --text-display: clamp(2.375rem, 1.375rem + 4.2vw, 4.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 700;
+
+  --text-h2: clamp(1.875rem, 1.2rem + 2.2vw, 2.75rem);
+  --text-h2--line-height: 1.15;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h3--font-weight: 600;
+
+  --text-body-lg: 1.0625rem;
+  --text-body-lg--line-height: 1.65;
+  --text-body-lg--font-weight: 400;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+  --text-body--font-weight: 400;
+
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.55;
+  --text-small--font-weight: 400;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.4;
+  --text-eyebrow--letter-spacing: 0.18em;
+  --text-eyebrow--font-weight: 500;
+
+  /* ---- petal colours: the five figures of the logo mark ----
+     These are the ONLY place the literal artwork colours live. They are
+     separate from the pillar ramps above because they answer a different
+     question: the ramps are "what colour should this UI role be", these
+     are "how close to the real logo can we get and stay legible".
+
+     In DARK mode all five are the authored artwork values, unchanged -
+     measured at 3.16:1 (purple) to 13.01:1 (amber) on the dark surface.
+     In LIGHT mode three of them fail 3:1 on the bone background and are
+     corrected by lightness ONLY, hue and chroma untouched:
+       corporate #159cbc  2.75:1 -> -2.4pp  (imperceptible)
+       live      #46b052  2.36:1 -> -6.4pp  (slight)
+       content   #fcd088  1.23:1 -> -25.2pp (unavoidable - a 88%-light
+                 amber cannot reach 3:1 against a 94.5%-light page at
+                 any chroma, so on light it reads as ochre)
+     activation and weddings pass as authored in both themes. See the
+     solver output recorded in PLAN.md. */
+  --color-petal-activation: #e8262d;
+  --color-petal-content: oklch(62.8% 0.103 79);
+  --color-petal-live: oklch(61% 0.165 145);
+  --color-petal-corporate: oklch(61.8% 0.11 220);
+  --color-petal-weddings: #834e9b;
+
+  /* ---- logo chip ----
+     A handful of the real extracted client-logo PNGs (public/media/
+     clients) carry their own dark/literal-colour artwork - Reliance's
+     wordmark is a dark serif that is close to unreadable once the page
+     background goes dark (measured: near-black text on the dark theme
+     surface). These two tokens give every client logo a small, constant,
+     near-white card to sit on regardless of site theme, the same fix a
+     lot of real trust bars use for exactly this problem (client logos
+     were never designed to be theme-aware). Deliberately NOT overridden
+     in the dark block below - staying constant across themes is the
+     entire point. */
+  --color-chip: oklch(98% 0.004 90);
+  --color-chip-border: oklch(90% 0.006 90);
+
+  /* ---- footer ----
+     The footer is deep in BOTH themes, so it cannot be built out of ink /
+     surface: in dark mode --color-ink is near-white, and a bg-ink footer
+     would come out white. These are its own tokens, overridden in the dark
+     block only to sit slightly deeper than the page so the edge still
+     reads. Measured on the light-theme footer ground:
+     footer-ink 17.4:1, footer-muted 6.3:1. */
+  --color-footer-bg: oklch(17% 0.018 255);
+  --color-footer-raised: oklch(22% 0.02 255);
+  --color-footer-ink: oklch(97% 0.004 255);
+  --color-footer-muted: oklch(67.2% 0.015 255);
+  --color-footer-hairline: oklch(31% 0.02 255);
+}
+
+/*
+ * ============================ DARK THEME ============================
+ *
+ * Same token NAMES, different values. Because every Tailwind v4 utility
+ * compiles to var(--color-...) rather than to a literal, redefining the
+ * variables here re-colours the entire site with no dark: variants in any
+ * component. That is the whole reason the codebase uses semantic tokens
+ * (surface / ink / hairline) instead of literal colours.
+ *
+ * This block is deliberately UNLAYERED. Tailwind emits its @theme
+ * variables into @layer theme, and unlayered declarations beat layered
+ * ones outright - so these win regardless of specificity. (The same
+ * cascade rule bit us the other way round once: see the @layer base note
+ * in globals.css, where unlayered heading colours were silently killing
+ * every text-colour utility on h1/h2/h3.)
+ *
+ * Every value below was solved, not picked. Contrast against the dark
+ * surface oklch(18% 0.018 255):
+ *   ink 17.2:1 - ink-body 10.9:1 - ink-muted 6.3:1
+ *   pillar ink >= 4.5:1 - pillar mark >= 3:1
+ * The *-fill values are intentionally NOT overridden: a fill only has to
+ * carry its own white label (4.45-4.53:1, unchanged by the page theme),
+ * and it still separates from the dark page at ~4.2:1.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-surface: oklch(18% 0.018 255);
+  --color-surface-raised: oklch(23% 0.02 255);
+  --color-ink: oklch(97% 0.004 255);
+  --color-ink-body: oklch(82.2% 0.012 255);
+  --color-ink-muted: oklch(67.2% 0.015 255);
+  --color-hairline: oklch(32% 0.02 255);
+
+  /* ink role - authored artwork colour where it already clears 4.5:1,
+     lifted in lightness only where it does not (activation, weddings). */
+  --color-activation-ink: oklch(61.5% 0.225 26);
+  --color-content-ink: oklch(88% 0.103 79);
+  --color-live-ink: oklch(67.4% 0.165 145);
+  --color-corporate-ink: oklch(64.2% 0.113 220);
+  --color-weddings-ink: oklch(60.1% 0.13 314);
+
+  /* mark role - all five are the authored artwork values on dark. */
+  --color-activation-mark: #e8262d;
+  --color-content-mark: #fcd088;
+  --color-live-mark: #46b052;
+  --color-corporate-mark: #159cbc;
+  --color-weddings-mark: #834e9b;
+
+  /* wash role - tinted section backgrounds, inverted to dark tints. */
+  --color-activation-wash: oklch(24% 0.03 26);
+  --color-content-wash: oklch(24% 0.03 79);
+  --color-live-wash: oklch(24% 0.03 146);
+  --color-corporate-wash: oklch(24% 0.03 220);
+  --color-weddings-wash: oklch(24% 0.03 314);
+
+  /* petals - the real artwork, unmodified, all five clearing 3:1 here. */
+  --color-petal-activation: #e8262d;
+  --color-petal-content: #fcd088;
+  --color-petal-live: #46b052;
+  --color-petal-corporate: #159cbc;
+  --color-petal-weddings: #834e9b;
+
+  --flood-inner: oklch(24% 0.045 var(--brand-hue));
+  --flood-outer: oklch(17% 0.05 var(--brand-hue));
+
+  /* Sit below the already-dark page so the footer edge is still legible. */
+  --color-footer-bg: oklch(12% 0.015 255);
+  --color-footer-raised: oklch(17% 0.018 255);
+}
+
+/*
+ * Plain :root - not inside @theme, so never tree-shaken. See file header.
+ */
+:root {
+  color-scheme: light;
+
+  /* The ambient wash the hero sequence floods to. Tokenised so the one
+     gradient declaration in the component works in both themes. */
+  --flood-inner: oklch(96.2% 0.03 var(--brand-hue));
+  --flood-outer: oklch(92% 0.05 var(--brand-hue));
+  /* ---- pillar hue angles: the only thing taken from the logo. Reference
+     values (documentation, and available to JS via getComputedStyle); no
+     CSS in this codebase computes colours live from these directly - see
+     PLAN.md section 2.1. ---- */
+  --hue-activation: 26;
+  --hue-content: 79;
+  --hue-live: 146;
+  --hue-corporate: 220;
+  --hue-weddings: 314;
+
+  /* ---- motion durations. No Tailwind theme namespace exists for
+     duration (unlike --ease-*, --radius-*, --shadow-*), so these never
+     auto-generate a utility class. Apply with Tailwind arbitrary-value
+     syntax, e.g. duration-(--dur-base), or read as plain var() in CSS.
+     Motion (Framer Motion) components take these as hardcoded JS
+     numbers instead - see the reduced-motion pattern in PLAN.md section
+     2.6 - kept here so both stay traceable to one documented source
+     instead of drifting apart. ---- */
+  --dur-fast: 180ms;
+  --dur-base: 420ms;
+  --dur-slow: 700ms;
+  --dur-hero: 1200ms;
+
+  /* ---- header height reservation ----
+     Header.tsx is sticky top-0. HeroSequence's pinned stage (.hero-stage
+     in globals.css) is ALSO sticky top-0, since it has to stay fixed
+     while its 980svh wrapper scrolls past. Two things stuck to the same
+     y:0 would fight for the same pixels for the whole intro sequence -
+     concretely, the Act 2/3 anchored headline (which settles ~8svh from
+     the top of the stage) would sit almost exactly under the header bar.
+
+     This variable is how .hero-stage reserves exactly the header's real
+     height instead. The value here is a same-paint-frame FALLBACK,
+     matching Header's own unscrolled Tailwind heights (72px below lg,
+     110px at lg+ - see the media query below, lg=1024px confirmed
+     against node_modules/tailwindcss/theme.css, not assumed). Once
+     mounted, Header.tsx overwrites this continuously via ResizeObserver
+     with its true measured height, including the post-scroll shrink to
+     84px at lg+ - so this default only matters for the instant before
+     that effect runs. */
+  --header-h: 72px;
+}
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 110px;
+  }
+}
+
+/*
+ * Ambient hue for the Phase 10 scroll effect. Registered as a NUMBER,
+ * not a colour - number interpolation is universally supported once
+ * registered, which avoids all @property color support questions.
+ * @property registrations are always active regardless of usage - this
+ * is a separate mechanism from @theme and is not subject to tree-shaking.
+ */
+@property --brand-hue {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 220;
+}

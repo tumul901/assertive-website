@@ -1,26 +1,210 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Point Tailwind dark: variant at our own attribute instead of the OS
+ * media query. The theme is a visitor CHOICE persisted to localStorage,
+ * so the media query is only the initial default (applied by the blocking
+ * script in layout.tsx) and must not keep overriding the choice.
+ *
+ * Most of the site needs no dark: utilities at all - the tokens in
+ * tokens.css are redefined per theme and every Tailwind utility compiles
+ * to var(--color-...), so colours follow automatically. This variant is
+ * for the handful of cases that genuinely differ in kind rather than in
+ * value, such as swapping a sun icon for a moon.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/*
+ * Light-only by decision (PLAN.md section 2). The create-next-app Geist
+ * template ships a prefers-color-scheme: dark override - deliberately not
+ * carried over here, so the bone surface never flips to near-black on a
+ * dark-mode OS. Keep comments in this file plain ASCII, no apostrophes or
+ * backticks - one broke the Tailwind v4 CSS parser in tokens.css (see the
+ * header comment there).
+ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * These MUST stay inside @layer base. Written unlayered they win against
+ * every Tailwind utility no matter the specificity, because unlayered
+ * declarations always beat layered ones in the CSS cascade - and Tailwind
+ * v4 puts all utilities in @layer utilities. That is not a subtle
+ * difference: with these rules unlayered, text-surface / text-white / any
+ * text-colour utility on an h1, h2 or h3 is silently discarded, sitewide,
+ * with no warning from the build. It was found only when a heading placed
+ * on a dark section rendered pure black (computed lab(0 0 0)) while the
+ * paragraph beside it resolved its colour correctly.
+ *
+ * Tailwind declares the layer order as: theme, base, components,
+ * utilities. Declaring base here slots in ahead of utilities, so element
+ * defaults still apply but any utility can override them.
+ */
+@layer base {
+  body {
+    background: var(--color-surface);
+    color: var(--color-ink-body);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    color: var(--color-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/*
+ * THEME TRANSITION - the liquid spread.
+ *
+ * The browser default for a view transition is a crossfade of the two
+ * root snapshots. That is cancelled here so the ONLY thing that animates
+ * is the clip-path applied in ThemeToggle.tsx: the new, re-themed page is
+ * stacked above the old one and a blob is opened through it. Leaving the
+ * default fade on top makes the spread look like a smear.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/*
+ * Fallback for browsers without the View Transitions API (Firefox, at
+ * time of writing). Applied for the duration of the swap only - a
+ * permanent global colour transition would make every hover and focus
+ * state feel laggy, which is why this is a class and not a base rule.
+ */
+.theme-crossfade *,
+.theme-crossfade *::before,
+.theme-crossfade *::after {
+  transition:
+    background-color 380ms ease,
+    border-color 380ms ease,
+    color 380ms ease,
+    fill 380ms ease,
+    stroke 380ms ease !important;
+}
+
+/*
+ * A scroll-pinned stage. .hero-stage is the opening sequence, .pin-stage
+ * is the same mechanism reused mid-page (the About portal); they are one
+ * rule because they are one behaviour, and splitting them would just
+ * invite the two copies to drift.
+ *
+ * A plain hand-written class, not composed Tailwind utilities, because it
+ * needs a reduced-motion override on the SAME properties (position,
+ * height) that a responsive lg: variant also touches. Two independently-
+ * gated variants racing to win a cascade fight over one property is
+ * exactly the kind of Tailwind ordering question this codebase has been
+ * burned by before (see the tailwind-merge and @theme tree-shaking notes
+ * in tokens.css) - so it is sidestepped entirely by keeping both states
+ * in one rule this file fully controls.
+ *
+ * top/height read --header-h (tokens.css) so this reserves exactly
+ * Header's real rendered height and the two sticky elements never
+ * compete for the same pixels. The transition tracks Header's own
+ * height animation so the reservation resizes in step with it rather
+ * than snapping.
+ */
+@layer components {
+  .hero-stage,
+  .pin-stage {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
+    overflow: hidden;
+    transition:
+      top var(--dur-base),
+      height var(--dur-base);
+  }
+
+  /*
+   * FAQ disclosure animation. Pure CSS on a native <details> - see the
+   * header of FAQ.tsx for why that element and not a JS accordion.
+   *
+   * PROGRESSIVE ENHANCEMENT, and genuinely so. ::details-content is a
+   * recent addition and Firefox has no implementation at time of writing;
+   * where either it or interpolate-size is missing the panel simply snaps
+   * open, which is what a <details> has always done and what nobody has
+   * ever filed a bug about. Nothing here is load-bearing.
+   *
+   * The three declarations are one mechanism and none is optional:
+   *   interpolate-size  lets block-size animate to the KEYWORD auto, which
+   *                     is the only value that means "as tall as the
+   *                     answer". It is an inherited property, set here on
+   *                     the details element rather than on :root so it
+   *                     cannot quietly change how some unrelated
+   *                     transition elsewhere on the site resolves.
+   *   overflow: hidden  stops the answer spilling out of the box while
+   *                     that box is still shorter than its content.
+   *   allow-discrete    content-visibility is a discrete property, so
+   *                     without this it would flip at frame 0 and the
+   *                     height would appear to animate from nothing.
+   */
+  .faq-item {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-item::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size var(--dur-base) var(--ease-out-expo),
+      content-visibility var(--dur-base) var(--ease-out-expo) allow-discrete;
+  }
+
+  .faq-item[open]::details-content {
+    block-size: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage,
+  .pin-stage {
+    position: static;
+    top: auto;
+    height: auto;
+    transition: none;
+  }
+
+  /* With the stage unpinned there is no scroll timeline to position
+     against, so the absolutely-positioned layers have to rejoin the
+     flow or they would stack on top of each other at the stage origin. */
+  .pin-layer {
+    position: static;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* The blanket rule above does NOT reach the FAQ disclosure. The
+     universal selector matches elements, and ::before / ::after are named
+     explicitly because they are the two that would otherwise be missed -
+     ::details-content is a third, and it is where the entire open/close
+     transition lives. Without this line the one animation on this page
+     that expands a box vertically is the one that ignores the setting. */
+  .faq-item::details-content {
+    transition: none !important;
+  }
+
+  /* An expanding full-viewport shape is precisely what this setting is
+     asking us not to do. ThemeToggle skips startViewTransition entirely
+     under reduced motion; this is the belt-and-braces CSS half. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
