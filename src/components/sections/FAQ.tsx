@@ -23,15 +23,50 @@ import { FAQ as ITEMS } from "@/lib/data/faq";
  * found only by rendering the page with javaScriptEnabled:false. This
  * section needs nothing. It is already correct.
  *
- * NOT AN EXCLUSIVE ACCORDION. Giving every <details> the same `name`
- * attribute would make the browser close the others for free, and it was
- * tempting for the tidiness. It is not used because closing an item that
- * sits ABOVE the viewport yanks the page under the reader - a real
- * scroll jump, caused by content the user was not looking at. Several
- * answers open at once costs nothing here; these are short.
+ * EXCLUSIVE - one answer open at a time - via the shared `name` attribute
+ * on every <details>. That is a browser behaviour, not a listener: give
+ * them a common name and opening one closes its siblings, with no state,
+ * no effect and nothing to keep in sync. Browsers without it (it needs
+ * Chrome 120+, Safari 17.2+, Firefox 130+) simply allow several open,
+ * which is what this section did before and is not a failure.
  *
  * The first item is open on load so the section does not read as six
  * closed bars, and so there is real answer text in the initial paint.
+ */
+
+/*
+ * THE KNOWN COST OF EXCLUSIVITY, measured rather than guessed.
+ *
+ * Opening an answer that sits BELOW the open one closes something above
+ * the reader, so everything under it moves up and the row they just
+ * clicked slides out from under the pointer. Measured at 1440x900:
+ *
+ *   open item 1, click item 6   clicked row moves -130px
+ *   item 1 already closed       clicked row moves    0px
+ *   reduced motion, no anim     clicked row moves -129px
+ *
+ * The third line is the useful one: the CSS height transition is not the
+ * cause, so removing it would not help. This is just what an exclusive
+ * accordion does in normal flow.
+ *
+ * Browser scroll anchoring is the thing that would normally absorb it,
+ * and it does not fire here - measured at 0px of compensation with 1294px
+ * of page below the section, so it is not clamping either. The reason is
+ * <details> itself: a closed ::details-content is content-visibility:
+ * hidden, and that suppresses anchor selection in the subtree. No CSS
+ * fixes this.
+ *
+ * What WOULD fix it is recording the summary's viewport position on
+ * pointerdown and scrollBy-ing the delta once the toggle settles. That is
+ * deliberately not here. It needs a client component, and because the
+ * panel animates open over --dur-base it needs a frame loop rather than a
+ * single correction - scroll manipulation on every frame, competing with
+ * whatever the user's own trackpad momentum is doing. That is a large
+ * amount of fragile machinery aimed at 130px, on a list that is ~600px
+ * tall and almost always fully in view, in a section whose whole premise
+ * is that it ships no JavaScript. If the shift ever does bother someone,
+ * the honest fix is a layout that does not reflow - questions in a column
+ * with the answer in a fixed pane beside them - not a scroll patch.
  */
 
 /*
@@ -93,7 +128,7 @@ export function FAQ() {
 
           <Reveal delay={0.08} className="mt-12 border-t border-hairline">
             {ITEMS.map((item, i) => (
-              <details key={item.id} className={ITEM} open={i === 0}>
+              <details key={item.id} name="faq" className={ITEM} open={i === 0}>
                 {/*
                   list-none plus the -webkit- rule removes the default
                   disclosure triangle: Chrome and Firefox drop it for

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
+import { WhatsAppWidget } from "@/components/ui/WhatsAppWidget";
 import "./globals.css";
 
 // weight: 'variable' loads the full variable axis (Manrope 200-800,
@@ -126,7 +127,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <style dangerouslySetInnerHTML={{ __html: NO_JS_REVEAL_FALLBACK }} />
         </noscript>
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      {/* The widget lives in the layout, not on the page, because a
+          floating contact button that vanishes when you open a work
+          detail page is worse than not having one. It sits at z-30 on
+          purpose: under Header (z-50) and under the mobile nav overlay
+          (z-40), so opening the menu covers it rather than leaving a
+          green button floating over a full-screen sheet. */}
+      <body className="min-h-full flex flex-col">
+        {children}
+        <WhatsAppWidget />
+      </body>
     </html>
   );
 }

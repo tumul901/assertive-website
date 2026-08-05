@@ -8,10 +8,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { PILLARS } from "@/lib/data/pillars";
-
-const PHONE = "+91 99536 80538";
-const PHONE_HREF = "tel:+919953680538";
-const EMAIL = "info@assertivebrand.co.in";
+import { PHONE, PHONE_HREF, EMAIL } from "@/lib/data/contact";
 
 /*
  * PLAN.md Phase 9. Replaces the legacy form section (which had a large

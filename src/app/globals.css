@@ -163,6 +163,52 @@
   .faq-item[open]::details-content {
     block-size: auto;
   }
+
+  /*
+   * WhatsApp widget: the typing indicator, and a scrollbar that belongs to
+   * the dark panel rather than to the page.
+   *
+   * Hand-written because both are things Tailwind has no utility for - a
+   * three-dot keyframe with a per-dot delay, and ::-webkit-scrollbar,
+   * which is a pseudo-element and so never reachable from a class list.
+   * The delays themselves stay in the component (inline, per dot) since
+   * they are what makes it read as a wave rather than a blink.
+   *
+   * No reduced-motion override is needed below: the blanket rule in the
+   * media query at the bottom of this file already forces
+   * animation-duration on every element, and unlike ::details-content
+   * these dots are real elements the universal selector reaches.
+   */
+  @keyframes wa-bounce {
+    0%,
+    60%,
+    100% {
+      opacity: 0.35;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
+  .wa-dot {
+    animation: wa-bounce 1.1s infinite ease-in-out;
+  }
+
+  .wa-log::-webkit-scrollbar {
+    width: 6px;
+  }
+  .wa-log::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .wa-log::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.14);
+    border-radius: 10px;
+  }
+  .wa-log::-webkit-scrollbar-thumb:hover {
+    background: rgb(255 255 255 / 0.24);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-stage,

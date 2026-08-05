@@ -34,10 +34,11 @@ import { PETALS } from "@/lib/data/petals";
  *                   out of it, one per discipline colour
  *
  * WHY A COLOUR FIELD AND NOT A PHOTOGRAPH. This was first built falling
- * into media/hall.png. Two problems, one fatal. The soft one: it is a
- * generic stock ballroom that says nothing this agency specifically does.
- * The fatal one: it is 811x517, so full-bleed on a 1440px stage it was
- * already being upscaled about 1.8x before the portal magnified anything.
+ * into a ballroom photograph (media/hall.png, since deleted - it had no
+ * other use). Two problems, one fatal. The soft one: a generic stock
+ * ballroom says nothing this agency specifically does. The fatal one: it
+ * was 811x517, so full-bleed on a 1440px stage it was already being
+ * upscaled about 1.8x before the portal magnified anything.
  * The field below is pure CSS, so it is resolution-independent - it stays
  * exactly as clean at 44x as at rest - it is built from the five petal
  * colours of the mark, and it costs no bytes. Falling through the words
