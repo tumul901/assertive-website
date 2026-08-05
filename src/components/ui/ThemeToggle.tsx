@@ -55,10 +55,23 @@ export function ThemeToggle({ className }: { className?: string }) {
       return;
     }
 
+    // The LARGEST of the three viewport measures, not innerWidth alone.
+    // They disagree in ordinary situations - clientWidth excludes a classic
+    // scrollbar, visualViewport shrinks under pinch-zoom or a soft keyboard
+    // - and the blob is sized against a snapshot box that may match any of
+    // them. Taking the max can only ever over-cover, and over-covering is
+    // invisible (the blob is off-screen by then) while under-covering
+    // leaves a strip of the old theme sitting on an edge. See EDGE_SLACK in
+    // liquid-reveal.ts for the rest of that argument.
+    const de = document.documentElement;
+    const vv = window.visualViewport;
+    const w = Math.max(window.innerWidth, de.clientWidth, vv?.width ?? 0);
+    const h = Math.max(window.innerHeight, de.clientHeight, vv?.height ?? 0);
+
     const rect = btnRef.current?.getBoundingClientRect();
-    const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const x = rect ? rect.left + rect.width / 2 : w / 2;
     const y = rect ? rect.top + rect.height / 2 : 0;
-    const r = coverRadius(x, y, window.innerWidth, window.innerHeight);
+    const r = coverRadius(x, y, w, h);
 
     const transition = document.startViewTransition(() => applyTheme(next));
     try {

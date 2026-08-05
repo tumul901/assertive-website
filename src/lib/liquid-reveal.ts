@@ -50,9 +50,33 @@ function blobPath(cx: number, cy: number, r: number, phase: number, amp: number)
   return `${d} Z`;
 }
 
+/*
+ * Slack added to the cover radius, in px, on top of the corner distance.
+ *
+ * The blob is positioned with getBoundingClientRect / window.innerWidth,
+ * i.e. the JS viewport - but it is CLIPPING ::view-transition-new(root),
+ * whose coordinate space is the snapshot containing block. Those are the
+ * same box in every engine tested here (Chromium and WebKit, verified),
+ * yet the spec lets the snapshot block differ from the JS viewport by
+ * browser UI insets, and a reported case had the right edge re-theming
+ * visibly after everything else - which is what an OFFSET between the two
+ * looks like. Not a too-small radius: the toggle sits near the right edge,
+ * so that edge is the CLOSEST one and cannot be the last to fill unless
+ * the whole blob is shifted away from it.
+ *
+ * A flat pixel margin rather than a bigger multiplier, because the two do
+ * very different things to the timing. The radius is pre-eased with
+ * ease-out-expo, so scaling it up moves the moment of full cover sharply
+ * earlier: 1.06 -> 1.35 would cover the viewport by t=0.19 of a 900ms run
+ * and leave three quarters of the animation as dead time. +72px on a
+ * ~1478px radius is under 5%, absorbing an inset far larger than any
+ * plausible one while barely touching how the spread reads.
+ */
+const EDGE_SLACK = 72;
+
 /** Distance from (x, y) to the furthest corner - how big the blob must get. */
 export function coverRadius(x: number, y: number, w: number, h: number) {
-  return Math.hypot(Math.max(x, w - x), Math.max(y, h - y));
+  return Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) + EDGE_SLACK;
 }
 
 export function liquidFrames(x: number, y: number, maxR: number, steps = 15) {
