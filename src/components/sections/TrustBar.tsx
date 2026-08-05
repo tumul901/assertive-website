@@ -35,14 +35,30 @@ export function TrustBar() {
           <ul className="grid w-full grid-cols-2 items-center gap-4 sm:flex sm:flex-1 sm:flex-wrap sm:justify-between sm:gap-6">
             {CLIENTS.map((client) => (
               <li key={client.name} className="flex justify-center">
-                <div className="flex h-16 w-full items-center justify-center rounded-md border border-chip-border bg-chip px-4 sm:w-auto sm:min-w-[112px]">
+                <div className="flex h-20 w-full items-center justify-center rounded-md border border-chip-border bg-chip px-4 sm:w-auto sm:min-w-[136px]">
+                  {/*
+                    h-14 against a 90px-tall source is a 0.62x downscale, so
+                    these are still being shrunk, not enlarged - there was a
+                    lot of headroom at the old h-8 (0.36x).
+
+                    WHAT THIS DOES NOT FIX. object-contain fits the whole
+                    140x90 CANVAS, and the five files carry very different
+                    amounts of transparent padding: measured ink fills 53%
+                    of the canvas height for News18 and 93% for Reliance,
+                    with the other three at 59-64%. So identical boxes still
+                    render Reliance about 1.8x larger than News18 optically.
+                    Growing the box scales that mismatch up rather than
+                    curing it. The real fix is to re-crop the source files
+                    to their ink, which is an asset change and wants a look
+                    at the result per logo, not a blind script run.
+                  */}
                   <Image
                     src={client.logo}
                     alt={client.name}
                     width={140}
                     height={90}
-                    sizes="120px"
-                    className="h-8 w-auto object-contain"
+                    sizes="140px"
+                    className="h-14 w-auto object-contain"
                   />
                 </div>
               </li>
