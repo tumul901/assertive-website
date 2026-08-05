@@ -80,7 +80,19 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
   return (
     <Link
       href={`/services#${pillar.id}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-surface-raised shadow-card transition-[transform,box-shadow] duration-[var(--dur-base)] ease-in-out hover:-translate-y-1 hover:shadow-card-hover focus-visible:outline-2 focus-visible:outline-offset-2"
+      /*
+       * ease-OUT, not the --ease-in-out token. That token is
+       * cubic-bezier(0.65, 0, 0.35, 1) - a slow start - and on a hover it
+       * reads as lag rather than softness: the card sits still for the
+       * first ~100ms after the pointer lands. An ease-out leaves
+       * immediately and settles slowly, which is the shape "soft" actually
+       * describes. Same curve on the way back down.
+       *
+       * The lift lives on this <a>, while CardStack drives the wrapper
+       * around it, so the two transforms compose instead of fighting - the
+       * deck can be mid-pop and a card can still be hovered.
+       */
+      className="group relative flex h-full flex-col overflow-hidden rounded-lg bg-surface-raised shadow-card transition-[transform,box-shadow] duration-[var(--dur-base)] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:scale-[1.015] hover:shadow-card-hover focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:!transform-none"
       style={{ outlineColor: `var(--color-${pillar.id}-ink)` }}
     >
       <span className={`h-1 w-full shrink-0 ${pillar.mark}`} aria-hidden="true" />

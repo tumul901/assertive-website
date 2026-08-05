@@ -100,6 +100,7 @@ type Cell = {
   dy: number;
   rot: number;
   sc: number;
+  z: number;
   /* 0 = deck, 1 = laid out. Held as a plain number rather than a
      MotionValue so that an interrupted animation can be restarted from
      wherever it actually got to: Motion cannot read x / rotate / scale back
@@ -115,7 +116,17 @@ type Cell = {
   run: AnimationPlaybackControls | null;
 };
 
-const blank = (): Cell => ({ el: null, dx: 0, dy: 0, rot: 0, sc: 1, t: 1, to: 1, run: null });
+const blank = (): Cell => ({
+  el: null,
+  dx: 0,
+  dy: 0,
+  rot: 0,
+  sc: 1,
+  z: 0,
+  t: 1,
+  to: 1,
+  run: null,
+});
 
 // useLayoutEffect warns when a client component is server-rendered; the
 // measurement genuinely has to happen before paint, so swap the hook rather
@@ -153,11 +164,17 @@ export function CardStack({
     const paint = (c: Cell) => {
       if (!c.el) return;
       const k = 1 - c.t;
-      c.el.style.transform =
-        k < 0.001
-          ? ""
-          : `translateX(${(c.dx * k).toFixed(2)}px) translateY(${(c.dy * k).toFixed(2)}px)` +
-            ` scale(${(1 - (1 - c.sc) * k).toFixed(4)}) rotate(${(c.rot * k).toFixed(2)}deg)`;
+      const flat = k < 0.001;
+      c.el.style.transform = flat
+        ? ""
+        : `translateX(${(c.dx * k).toFixed(2)}px) translateY(${(c.dy * k).toFixed(2)}px)` +
+          ` scale(${(1 - (1 - c.sc) * k).toFixed(4)}) rotate(${(c.rot * k).toFixed(2)}deg)`;
+      /* Deck order only means anything while the cards overlap. Held past
+         that it outlives its purpose and starts costing something: the
+         card hover paints a 40px-blur shadow well into its neighbours'
+         boxes, and a card left on a lower layer has that shadow drawn
+         UNDER them. Cleared with the transform, restored with it. */
+      c.el.style.zIndex = flat ? "" : String(c.z);
     };
 
     const off = () => {
@@ -211,7 +228,8 @@ export function CardStack({
         c.sc = 1 - away * DIP;
         // Grid items honour z-index without being positioned, so the
         // middle card can be the top of the deck with no stacking context.
-        c.el.style.zIndex = String(count - away);
+        // paint() is what actually writes it - see the note there.
+        c.z = count - away;
         /* Promoted for as long as the stack is live, not just while a
            given pop runs. These transforms are written from JS, so the
            compositor never adopts them on its own the way it would a CSS

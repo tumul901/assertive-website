@@ -341,18 +341,43 @@ export function HeroSequence() {
                 />
               </div>
 
-              <div className="min-h-[clamp(240px,34svh,340px)]">
+              {/*
+                EVERY PANEL IS ALWAYS IN FLOW, STACKED IN ONE GRID CELL.
+                They used to switch with display:none, which is why the
+                copy changed with a hard cut however long the transition
+                said it was: a transition has nothing to run FROM out of
+                display:none, and the outgoing panel was pulled the instant
+                the beat changed, so its fade never got a frame.
+
+                Grid stacking rather than absolute positioning because the
+                cell then sizes to the TALLEST discipline instead of the
+                current one - the blurbs and chip counts differ enough that
+                the old version also nudged its own height on every beat.
+              */}
+              <div className="grid min-h-[clamp(240px,34svh,340px)]">
                 {DISCIPLINES.map((d, i) => {
                   const isActive = active?.id === d.id;
                   return (
                     <div
                       key={d.id}
                       aria-hidden={!isActive}
-                      className="transition-[opacity,transform] duration-[700ms] ease-out-expo"
+                      className="col-start-1 row-start-1 transition-[opacity,transform] ease-out-expo"
                       style={{
-                        display: beat === i + 1 ? "block" : "none",
                         opacity: isActive ? 1 : 0,
-                        transform: isActive ? "translateY(0)" : "translateY(14px)",
+                        /* Signed against the beat, so a discipline already
+                           passed leaves upward and one still to come waits
+                           below - the copy travels the same way the wheel
+                           is turning, and reverses with it on scroll-up. */
+                        transform: isActive
+                          ? "none"
+                          : `translateY(${i < beat - 1 ? -18 : 18}px)`,
+                        /* Out faster than in, and in slightly behind, so
+                           the two never sit at half opacity on top of each
+                           other. */
+                        transitionDuration: isActive ? "620ms" : "360ms",
+                        transitionDelay: isActive ? "110ms" : "0ms",
+                        // They overlap now, so only the live one is hittable.
+                        pointerEvents: isActive ? "auto" : "none",
                       }}
                     >
                       <span
@@ -393,11 +418,16 @@ export function HeroSequence() {
                 })}
 
                 <div
-                  className="transition-[opacity,transform] duration-[700ms] ease-out-expo"
+                  aria-hidden={beat !== 6}
+                  className="col-start-1 row-start-1 transition-[opacity,transform] ease-out-expo"
                   style={{
-                    display: beat === 6 ? "block" : "none",
                     opacity: beat === 6 ? 1 : 0,
-                    transform: beat === 6 ? "translateY(0)" : "translateY(14px)",
+                    // The close only ever arrives from below; there is no
+                    // beat after it to leave upward for.
+                    transform: beat === 6 ? "none" : "translateY(18px)",
+                    transitionDuration: beat === 6 ? "620ms" : "360ms",
+                    transitionDelay: beat === 6 ? "110ms" : "0ms",
+                    pointerEvents: beat === 6 ? "auto" : "none",
                   }}
                 >
                   <h3 className="text-h2 max-w-[16ch] text-ink">
@@ -411,12 +441,18 @@ export function HeroSequence() {
                   <div className="mt-8 flex flex-wrap gap-4">
                     <Link
                       href="/services"
+                      // display:none used to take these out of the tab
+                      // order for free; stacked and merely transparent,
+                      // they would otherwise be focusable while invisible
+                      // AND aria-hidden, which is the worst of both.
+                      tabIndex={beat === 6 ? 0 : -1}
                       className="rounded-md bg-corporate-fill px-6 py-3 font-medium text-white transition-colors duration-[var(--dur-fast)] hover:bg-corporate-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
                     >
                       View All Services
                     </Link>
                     <Link
                       href="/client-query"
+                      tabIndex={beat === 6 ? 0 : -1}
                       className="rounded-md border border-hairline px-6 py-3 font-medium text-ink transition-colors duration-[var(--dur-fast)] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
                     >
                       Start an Enquiry
