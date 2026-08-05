@@ -77,6 +77,30 @@ import { PETALS } from "@/lib/data/petals";
 const HEADING = "About Us";
 
 /*
+ * How far the masking sheet bleeds past the stage on each side, as a
+ * fraction. Insurance against preserveAspectRatio letterboxing - the long
+ * note beside the sheet explains what that looked like when it happened.
+ *
+ * THE NUMBER IS A PERFORMANCE FIGURE, not a taste one. This started at a
+ * full 3x (one whole stage of margin on every side), which is 9x the AREA
+ * of a luminance mask that the browser re-rasterizes on every frame the
+ * zoom transform changes. At a 1440x788 stage that is a ~10 megapixel
+ * offscreen buffer per frame, and it measured exactly as you would expect:
+ * scrolling into this section ran 26-35ms per frame (about 30fps) from
+ * p=0.0 to p=0.5, then snapped back to a clean 17ms at p>=0.6 - which is
+ * precisely where sheetOpacity fades the sheet out and the mask stops
+ * being painted at all. The zoom was never the expensive part.
+ *
+ * 8% keeps the same guarantee for any plausible sub-pixel or mid-
+ * transition mismatch while cutting the rasterized area by about 6.7x.
+ * Raising it back toward 1.0 will bring the stutter back; if a real
+ * letterboxing gap ever reappears, fix the viewBox measurement rather
+ * than widening this.
+ */
+const BLEED = 0.08;
+const BLEED_SPAN = 1 + BLEED * 2;
+
+/*
  * The client's About copy, verbatim. Three sentences that happen to be
  * three parallel statements - who we are, what we do, how we do it -
  * which is why they get parallel treatment rather than one prose block.
@@ -301,10 +325,20 @@ export function AboutPortal() {
             inset-0 left a bare wedge of page showing at two corners.
             Bleeding it past the stage costs nothing, since .pin-stage
             clips. */}
+        {/* will-change earns its keep here, which is not true of most
+            places it gets sprinkled. This div is the one moving part in
+            the portal the compositor can actually take over: it is an HTML
+            element carrying a CSS transform, so promoting it means the
+            conic gradient is rasterized once and then scaled and rotated
+            on the GPU, instead of the gradient being re-evaluated across a
+            1.36x-viewport box on every frame. The mask beside it cannot be
+            promoted the same way - its zoom lives on inner SVG <g>
+            transform attributes, which are not compositable at all, which
+            is why BLEED had to shrink instead. */}
         <div
           ref={fieldRef}
           aria-hidden="true"
-          className="pin-portal absolute -inset-[18%] motion-reduce:hidden"
+          className="pin-portal absolute -inset-[18%] will-change-transform motion-reduce:hidden"
           style={{ background: FIELD }}
         />
 
@@ -326,16 +360,16 @@ export function AboutPortal() {
             <mask
               id="about-portal-mask"
               maskUnits="userSpaceOnUse"
-              x={-vp.w}
-              y={-vp.h}
-              width={vp.w * 3}
-              height={vp.h * 3}
+              x={-vp.w * BLEED}
+              y={-vp.h * BLEED}
+              width={vp.w * BLEED_SPAN}
+              height={vp.h * BLEED_SPAN}
             >
               <rect
-                x={-vp.w}
-                y={-vp.h}
-                width={vp.w * 3}
-                height={vp.h * 3}
+                x={-vp.w * BLEED}
+                y={-vp.h * BLEED}
+                width={vp.w * BLEED_SPAN}
+                height={vp.h * BLEED_SPAN}
                 fill="#fff"
               />
               <g ref={maskG} transform={identity}>
@@ -359,24 +393,23 @@ export function AboutPortal() {
             {HEADING}
           </text>
 
-          {/* Sheet and mask are BOTH oversized to 3x the stage, anchored
-              one full stage up and left. The measured viewBox above should
-              already match the element exactly, but if it is ever off by
-              even a fraction - a sub-pixel svh, a --header-h mid-
-              transition, a zoom level - preserveAspectRatio's default
-              (xMidYMid meet) letterboxes, and a sheet sized to the viewBox
-              leaves a bare strip of the field down both edges. That is not
-              hypothetical: it shipped that way for one build and read as a
-              deliberate border. Overflowing the sheet makes the failure
-              structurally impossible rather than merely unlikely, and
-              nothing outside the stage is visible anyway because
-              .pin-stage clips it. */}
+          {/* Sheet and mask both bleed past the stage by BLEED on every
+              side. The measured viewBox above should already match the
+              element exactly, but if it is ever off by even a fraction - a
+              sub-pixel svh, a --header-h mid-transition, a zoom level -
+              preserveAspectRatio's default (xMidYMid meet) letterboxes,
+              and a sheet sized to the viewBox leaves a bare strip of the
+              field down both edges. That is not hypothetical: it shipped
+              that way for one build and read as a deliberate border.
+              Nothing outside the stage is visible anyway - .pin-stage
+              clips it - so the bleed is free at paint time. See BLEED for
+              why it is 8% and not the 3x it started at. */}
           <rect
             ref={sheetRef}
-            x={-vp.w}
-            y={-vp.h}
-            width={vp.w * 3}
-            height={vp.h * 3}
+            x={-vp.w * BLEED}
+            y={-vp.h * BLEED}
+            width={vp.w * BLEED_SPAN}
+            height={vp.h * BLEED_SPAN}
             fill="var(--color-surface)"
             mask="url(#about-portal-mask)"
           />
