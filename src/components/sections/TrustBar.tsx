@@ -35,11 +35,29 @@ export function TrustBar() {
           <ul className="grid w-full grid-cols-2 items-center gap-4 sm:flex sm:flex-1 sm:flex-wrap sm:justify-between sm:gap-6">
             {CLIENTS.map((client) => (
               <li key={client.name} className="flex justify-center">
-                <div className="flex h-20 w-full items-center justify-center rounded-md border border-chip-border bg-chip px-4 sm:w-auto sm:min-w-[136px]">
+                {/*
+                  Sizes are NOT monotonic with viewport, and that is not a
+                  typo. The eyebrow, divider and gaps eat a fixed ~190px out
+                  of the row, and the bar is capped at max-w-1180 - so the
+                  tightest layout is not mobile, it is the sm-to-lg row.
+                  Measured space for the five chips: 673px at 1024, but
+                  909px at 1280 and above (where the cap makes it constant).
+                  Mobile is a 2-column grid with no eyebrow beside it, so it
+                  has room for the big size too.
+
+                  At 1024 that allows ~115px per chip; anything larger wraps
+                  to a second row and doubles the bar's height - it went to
+                  296px before this was split, which is how the wrap was
+                  caught.
+                */}
+                <div className="flex h-26 w-full items-center justify-center rounded-md border border-chip-border bg-chip px-4 sm:h-20 sm:w-auto sm:min-w-[112px] xl:h-26 xl:min-w-[160px]">
                   {/*
-                    h-14 against a 90px-tall source is a 0.62x downscale, so
-                    these are still being shrunk, not enlarged - there was a
-                    lot of headroom at the old h-8 (0.36x).
+                    h-20 against a 90px-tall source is 0.89x - very close to
+                    1:1, and that is the ceiling. Past 90px these start
+                    being upscaled and will soften, the same trap work.ts
+                    documents for the event photography. If they need to be
+                    bigger than this, the answer is higher-resolution logo
+                    files from the client, not a larger number here.
 
                     WHAT THIS DOES NOT FIX. object-contain fits the whole
                     140x90 CANVAS, and the five files carry very different
@@ -58,7 +76,7 @@ export function TrustBar() {
                     width={140}
                     height={90}
                     sizes="140px"
-                    className="h-14 w-auto object-contain"
+                    className="h-20 w-auto object-contain sm:h-12 xl:h-20"
                   />
                 </div>
               </li>
