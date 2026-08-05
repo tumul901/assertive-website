@@ -78,6 +78,28 @@ const HEADLINE_STYLE = {
   letterSpacing: "-0.035em",
 } as const;
 
+/*
+ * How far the solid layer's clip-path reaches PAST its own box, top and
+ * bottom, as a percentage of that box.
+ *
+ * Without it the descenders never fill in. clip-path clips to the border
+ * box, and lineHeight 1.02 above means the line box is barely taller than
+ * the em - so Manrope's descenders paint below it. Measured at the 88px
+ * cap: the h1 box ends at y=570 and the glyph run ends at y=584, i.e. 14px
+ * of every g, p and y hanging outside. The outline layer has no clip-path
+ * so it kept its descenders, the solid layer lost them, and the result was
+ * a headline that filled in white except for the tails, which stayed as
+ * hollow outlines for the whole sequence.
+ *
+ * Percent, not px, because the font-size is a clamp() - the overhang
+ * scales with it, so a fixed pixel figure would be right at exactly one
+ * viewport width. 25 is far more than the ~8% measured; there is nothing
+ * else inside this layer, so over-reaching reveals nothing and costs
+ * nothing. Negative inset() offsets are what expand a clip region outward
+ * (verified supported before relying on it).
+ */
+const CLIP_BLEED = 25;
+
 const ANCHOR_STYLE = {
   fontFamily: "var(--font-display)",
   fontWeight: 800,
@@ -109,7 +131,7 @@ export function HeroSequence() {
 
   // ---- Act 1 ----------------------------------------------------------
   const wipeRight = useTransform(p, [0.04, 0.25], [100, 0]);
-  const clip = useMotionTemplate`inset(0 ${wipeRight}% 0 0)`;
+  const clip = useMotionTemplate`inset(${-CLIP_BLEED}% ${wipeRight}% ${-CLIP_BLEED}% 0)`;
   const front = useTransform(p, [0.04, 0.25], [0, 100]);
   const gather = useTransform(p, [0.25, 0.31], [0, 1]);
   const threadOpacity = useTransform(p, [0.02, 0.05, 0.29, 0.33], [0, 1, 1, 0]);
@@ -221,8 +243,13 @@ export function HeroSequence() {
               <div
                 ref={solidRef}
                 aria-hidden="true"
-                className="absolute inset-0 text-ink motion-reduce:![clip-path:inset(0)]"
-                style={{ ...HEADLINE_STYLE, clipPath: "inset(0 100% 0 0)" }}
+                // Both clip values carry the vertical bleed too - the
+                // reduced-motion one because it is the FINAL state (fully
+                // wiped), which is exactly where a clipped descender would
+                // sit permanently, and the inline one because it is what
+                // the server renders before any scroll value exists.
+                className="absolute inset-0 text-ink motion-reduce:![clip-path:inset(-25%_0_-25%_0)]"
+                style={{ ...HEADLINE_STYLE, clipPath: `inset(${-CLIP_BLEED}% 100% ${-CLIP_BLEED}% 0)` }}
               >
                 From Concept to Celebration:
                 <br />
