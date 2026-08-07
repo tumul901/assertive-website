@@ -4,7 +4,7 @@ import { HeroSequence } from "@/components/sections/HeroSequence";
 import { TrustBar } from "@/components/sections/TrustBar";
 import { Pillars } from "@/components/sections/Pillars";
 import { AboutPortal } from "@/components/sections/AboutPortal";
-import { SelectedWork } from "@/components/sections/SelectedWork";
+import { CaseStudies } from "@/components/sections/CaseStudies";
 import { Scale } from "@/components/sections/Scale";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { FAQ } from "@/components/sections/FAQ";
@@ -19,7 +19,7 @@ export default function Home() {
         <TrustBar />
         <Pillars />
         <AboutPortal />
-        <SelectedWork />
+        <CaseStudies />
         <Scale />
         <Testimonials />
         <FAQ />

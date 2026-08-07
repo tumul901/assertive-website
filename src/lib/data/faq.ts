@@ -55,7 +55,7 @@ export const FAQ: FaqItem[] = [
   {
     id: "production",
     q: "Do you handle production, or only the planning?",
-    a: "Both. Set design and construction, stage and show management, lighting, registration desks and on-ground hosting are all part of what we have delivered. The note under each event in Selected Events says which of those applied to it.",
+    a: "Both. Set design and construction, stage and show management, lighting, registration desks and on-ground hosting are all part of what we have delivered. The Case Studies section says which of those applied to each event.",
   },
   {
     id: "where",

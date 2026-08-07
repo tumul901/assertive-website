@@ -77,11 +77,28 @@ const NO_FLASH = `(function(){try{var k='assertive-theme',t=localStorage.getItem
  * reduced-motion rules in globals.css do, on purpose - one degraded
  * presentation to reason about, not two.
  *
- * The accordion gallery (Selected Events) is a third instance of the same
- * shape, and the substring rule above does NOT cover it, because none of
- * its hidden state is an inline style. Three separate things break with no
- * JS, and all three had to be seen in a real javaScriptEnabled:false render
- * before they were believed:
+ * The case-study carousel is the one place where the substring rule above
+ * is actively WRONG, and it is worth understanding why rather than adding
+ * another exception later. Reveal's opacity:0 means "not animated in yet" -
+ * a state that exists only because JS exists, so forcing it visible is a
+ * pure win. A carousel's opacity:0 means "this is slide four" - a state
+ * that is perfectly valid with no JS at all, because slide one is showing
+ * and it is real, readable content. Unhiding the other four does not
+ * recover anything; it lays five case studies on top of each other in the
+ * one grid cell they deliberately share.
+ *
+ * So the inactive slides are hidden outright here. They stay in the HTML
+ * for a crawler to read, `inert` already carries which ones they are, and
+ * display:none beats the opacity:1 the blanket rule hands them regardless
+ * of source order. The controls go too: buttons whose only job is to call
+ * setState are worse than absent when nothing can call it.
+ *
+ * The accordion gallery (the previous Selected Events section, since
+ * replaced by that carousel - the component is still in components/ui) was
+ * a third instance of the same shape, and the substring rule above did NOT
+ * cover it, because none of its hidden state was an inline style. Three
+ * separate things broke with no JS, and all three had to be seen in a real
+ * javaScriptEnabled:false render before they were believed:
  *
  *   - the captions are hidden by Tailwind's opacity-0 CLASS;
  *   - every photo is grey, because --ag-gray is only ever written by GSAP
@@ -112,6 +129,8 @@ const NO_JS_REVEAL_FALLBACK = `
 .pin-portal{display:none !important;}
 [aria-label="Image accordion gallery"] span{opacity:1 !important;filter:none !important;}
 [aria-label="Image accordion gallery"] > * > span:first-child > span:first-child{inset:0 !important;width:100% !important;height:100% !important;transform:none !important;}
+[data-cs-slide][inert],[data-cs-controls],[data-cs-dots]{display:none !important;}
+img[data-cs-photo]~img[data-cs-photo]{display:none !important;}
 `;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -26,9 +26,9 @@ import { PILLARS, type Pillar } from "@/lib/data/pillars";
  * a line. Five across also survives, which is worth keeping: five equal
  * cards is the same count as the five petals of the mark.
  *
- * The header block is deliberately the same shape as SelectedWork's -
- * heading left, "View All" right - since they are now the same kind of
- * section.
+ * The header block is deliberately the same shape as CaseStudies' -
+ * heading and blurb left, "View All" right - since they are now the same
+ * kind of section.
  *
  * DO NOT colour the "Explore" label. Section 2.5's link-colour rule:
  * four of the five pillar inks fail body-text contrast at small sizes

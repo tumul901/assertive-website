@@ -119,9 +119,9 @@ export function FAQ() {
         <div className="mx-auto max-w-[820px]">
           <Reveal className="text-center">
             {/* Plain, not clever. Every other h2 on this page is
-                descriptive title case - "Selected Events", "What Our
-                Clients Say About Us" - and an oblique one here would be
-                the only heading a visitor has to decode. */}
+                descriptive title case - "Case Studies", "What Our Clients
+                Say About Us" - and an oblique one here would be the only
+                heading a visitor has to decode. */}
             <Eyebrow className="text-corporate-ink">Good to know</Eyebrow>
             <h2 className="text-h2 mt-4 text-ink">Questions We Get Asked</h2>
           </Reveal>
