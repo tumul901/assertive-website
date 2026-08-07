@@ -22,25 +22,50 @@ import { PHONE, PHONE_HREF, EMAIL } from "@/lib/data/contact";
  * sourced from PILLARS, so an enquiry arrives already routed to a
  * discipline.
  *
- * UI only, per the spec - onSubmit is a stub that logs and shows a
- * success state. No backend, no react-hook-form; that arrives with the
- * Client Query page in a later plan.
+ * Submits to /api/leads with source: "enquiry" - the same endpoint the
+ * WhatsApp widget's contact step posts to, so both land in one place for
+ * the /admin/leads page. Event Type is sent as the pillar's display name,
+ * not its id ("Corporate & MICE", not "corporate") - the id is only a
+ * stable <select> value, the admin page should not have to know pillar
+ * ids to read a submission.
  */
 export function Enquiry() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const nameId = useId();
   const emailId = useId();
   const phoneId = useId();
   const eventTypeId = useId();
   const messageId = useId();
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    // TODO(backend): stub only, per Phase 9 - wire to a real endpoint
-    // when the Client Query page's backend lands.
-    console.log("[Enquiry] stub submission", data);
-    setSubmitted(true);
+    const data = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
+    const eventType = PILLARS.find((p) => p.id === data.eventType)?.name ?? data.eventType;
+
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "enquiry",
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          eventType,
+          message: data.message,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong sending your enquiry. Please try again, or call/email us directly.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -147,8 +172,25 @@ export function Enquiry() {
                   />
                 </div>
 
-                <Button type="submit" variant="primary" className="mt-2 justify-center">
-                  Send Enquiry
+                {error && (
+                  // #dc2626 is a literal, not a token - this codebase's
+                  // colours are all solved per-theme (tokens.css), and no
+                  // error/danger token exists yet. Same call WhatsAppWidget
+                  // already made for its own inline validation message
+                  // (#f15c6d there): a plain hex via style, not an untested
+                  // dark: variant this project's theming does not use.
+                  <p role="alert" className="text-small" style={{ color: "#dc2626" }}>
+                    {error}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={submitting}
+                  className="mt-2 justify-center disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {submitting ? "Sending..." : "Send Enquiry"}
                 </Button>
               </form>
             )}

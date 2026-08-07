@@ -11,6 +11,7 @@ export interface ButtonProps {
   href?: string;
   type?: "button" | "submit";
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 // outline + outline-offset draws the focus ring OUTSIDE the element, on
@@ -33,6 +34,7 @@ export function Button({
   href,
   type = "button",
   onClick,
+  disabled,
 }: ButtonProps) {
   const classes = cn(base, variants[variant], className);
 
@@ -69,7 +71,7 @@ export function Button({
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button type={type} onClick={onClick} disabled={disabled} className={classes}>
       {content}
     </button>
   );
