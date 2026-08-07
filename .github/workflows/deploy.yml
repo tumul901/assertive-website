@@ -48,6 +48,7 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd ~/assertive-website
+            git pull origin main
             npm install --omit=dev
             npx prisma db push
             pm2 restart assertive-demo || pm2 start npm --name "assertive-demo" -- start
