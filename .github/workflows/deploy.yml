@@ -1,0 +1,41 @@
+name: Deploy to MilesWeb
+
+on:
+  push:
+    branches:
+      - main # Change this to 'staging' if you prefer
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            # 1. Navigate to the project directory
+            # MAKE SURE THIS MATCHES YOUR ACTUAL FOLDER NAME ON THE SERVER
+            cd ~/demo.assertivebrand.co.in
+            
+            # 2. Pull the latest code from GitHub
+            git pull origin main
+            
+            # 3. Install dependencies
+            npm install
+            
+            # 4. Generate Prisma Client
+            npx prisma generate
+            
+            # 5. Push database schema changes (preserves existing data)
+            npx prisma db push
+            
+            # 6. Build the Next.js application
+            npm run build
+            
+            # 7. Restart the PM2 process
+            pm2 restart assertive-demo || pm2 start npm --name "assertive-demo" -- start

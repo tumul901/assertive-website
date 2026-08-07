@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     qualities: [75, 82],
   },
   serverExternalPackages: ["better-sqlite3", "@prisma/adapter-better-sqlite3"],
+  output: "standalone",
 };
 
 export default nextConfig;
