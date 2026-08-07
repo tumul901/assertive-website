@@ -27,15 +27,13 @@ jobs:
       - name: Build Next.js Application
         run: npm run build
 
-      - name: Deploy to Server via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.SERVER_PORT }}
-          source: ".next,public,package.json,prisma"
-          target: "/home/sukrivas1/assertive-website"
+      - name: Push Build to Production Branch
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add -f .next
+          git commit -m "Deploy build [skip ci]"
+          git push -f origin HEAD:production
 
       - name: Restart Server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -48,7 +46,8 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             cd ~/assertive-website
-            git pull origin main
+            git fetch --all
+            git reset --hard origin/production
             npm install --omit=dev
             npx prisma db push
             pm2 restart assertive-demo || pm2 start npm --name "assertive-demo" -- start
