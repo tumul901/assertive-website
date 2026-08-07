@@ -34,7 +34,7 @@ export default async function AdminLeadsPage() {
   } catch (err) {
     console.error("[admin/leads] failed to load leads:", err);
     loadError =
-      "Could not load leads. If storage was just set up, double-check UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are set.";
+      "Could not load leads from the SQLite database. Check your Prisma configuration or terminal logs for more details.";
   }
 
   return (
@@ -76,6 +76,20 @@ export default async function AdminLeadsPage() {
   );
 }
 
+import { Trash2 } from "lucide-react";
+import { revalidatePath } from "next/cache";
+import { DeleteButton } from "./DeleteButton";
+
+async function handleDelete(formData: FormData) {
+  "use server";
+  const id = formData.get("id") as string;
+  if (id) {
+    const { deleteLead } = await import("@/lib/leads");
+    await deleteLead(id);
+    revalidatePath("/admin/leads");
+  }
+}
+
 function LeadCard({ lead }: { lead: Lead }) {
   const details: Array<[string, string | undefined]> = [
     ["Phone", lead.phone],
@@ -87,16 +101,23 @@ function LeadCard({ lead }: { lead: Lead }) {
 
   return (
     <li className="rounded-lg bg-surface-raised p-5 shadow-card sm:p-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-small inline-flex items-center rounded-full border border-hairline px-2.5 py-1 font-medium text-ink-body">
-          {SOURCE_LABEL[lead.source]}
-        </span>
-        <time dateTime={lead.createdAt} className="text-small text-ink-body">
-          {new Date(lead.createdAt).toLocaleString("en-IN", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })}
-        </time>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-small inline-flex items-center rounded-full border border-hairline px-2.5 py-1 font-medium text-ink-body">
+            {SOURCE_LABEL[lead.source]}
+          </span>
+          <time dateTime={lead.createdAt} className="text-small text-ink-body">
+            {new Date(lead.createdAt).toLocaleString("en-IN", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
+          </time>
+        </div>
+        
+        <form action={handleDelete}>
+          <input type="hidden" name="id" value={lead.id} />
+          <DeleteButton />
+        </form>
       </div>
 
       <div className="mt-4 flex flex-col gap-0.5">

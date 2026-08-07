@@ -352,6 +352,18 @@ export function WhatsAppWidget() {
                   href={whatsappUrl(draft)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    fetch("/api/leads", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        source: "whatsapp",
+                        eventType: event.label,
+                        timing: timing.label,
+                        message: draft,
+                      }),
+                    }).catch(console.error);
+                  }}
                   className="mt-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2"
                   style={{ backgroundColor: PANEL.action, outlineColor: PANEL.fab }}
                 >

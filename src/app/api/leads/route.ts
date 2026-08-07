@@ -30,11 +30,13 @@ export async function POST(request: Request) {
   if (source !== "enquiry" && source !== "whatsapp") {
     return NextResponse.json({ error: "Invalid source." }, { status: 400 });
   }
-  if (typeof name !== "string" || name.trim().length === 0 || name.length > 100) {
-    return NextResponse.json({ error: "A name is required." }, { status: 400 });
-  }
-  if (typeof email !== "string" || !isValidEmail(email)) {
-    return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
+  if (source === "enquiry") {
+    if (typeof name !== "string" || name.trim().length === 0 || name.length > 100) {
+      return NextResponse.json({ error: "A name is required." }, { status: 400 });
+    }
+    if (typeof email !== "string" || !isValidEmail(email)) {
+      return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
+    }
   }
 
   // Rate limiting is a secondary control and fails OPEN: a Redis hiccup
