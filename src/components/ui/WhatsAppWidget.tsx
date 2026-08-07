@@ -358,8 +358,8 @@ export function WhatsAppWidget() {
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
                         source: "whatsapp",
-                        eventType: event.label,
-                        timing: timing.label,
+                        eventType: event?.label,
+                        timing: timing?.label,
                         message: draft,
                       }),
                     }).catch(console.error);

@@ -18,9 +18,12 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
+            # Load NVM so npm and pm2 commands work in non-interactive SSH
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
             # 1. Navigate to the project directory
-            # MAKE SURE THIS MATCHES YOUR ACTUAL FOLDER NAME ON THE SERVER
-            cd ~/demo.assertivebrand.co.in
+            cd ~/assertive-website
             
             # 2. Pull the latest code from GitHub
             git pull origin main

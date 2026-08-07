@@ -62,8 +62,8 @@ export async function POST(request: Request) {
   try {
     await saveLead({
       source: source as LeadSource,
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
+      name: typeof name === "string" ? name.trim() : "",
+      email: typeof email === "string" ? email.trim().toLowerCase() : "",
       phone: asOptionalString(phone),
       company: asOptionalString(company),
       eventType: asOptionalString(eventType),
