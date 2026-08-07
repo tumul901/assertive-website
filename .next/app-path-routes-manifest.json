@@ -1,0 +1,14 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/leads/page": "/admin/leads",
+  "/admin/login/page": "/admin/login",
+  "/api/admin/login/route": "/api/admin/login",
+  "/api/leads/route": "/api/leads",
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/",
+  "/proto/portal/page": "/proto/portal",
+  "/proto/rundown/page": "/proto/rundown",
+  "/proto/threads/page": "/proto/threads",
+  "/services/[slug]/page": "/services/[slug]"
+}

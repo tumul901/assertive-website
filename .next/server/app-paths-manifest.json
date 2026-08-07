@@ -1,0 +1,14 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/leads/page": "app/admin/leads/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
+  "/api/admin/login/route": "app/api/admin/login/route.js",
+  "/api/leads/route": "app/api/leads/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/proto/portal/page": "app/proto/portal/page.js",
+  "/proto/rundown/page": "app/proto/rundown/page.js",
+  "/proto/threads/page": "app/proto/threads/page.js",
+  "/services/[slug]/page": "app/services/[slug]/page.js"
+}

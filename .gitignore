@@ -14,10 +14,9 @@
 /coverage
 
 # next.js
-/.next/
+/.next/cache
+# We only want to push the compiled server/static files, not the cache
 /out/
-
-# production
 /build
 
 # misc
@@ -32,17 +31,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
-
-# vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-.vercel
-.env*
-
 
 # Database files
 *.db
