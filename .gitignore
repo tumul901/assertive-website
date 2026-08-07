@@ -13,9 +13,8 @@
 # testing
 /coverage
 
-# We only want to push the compiled server/static files, not the cache or bundled binaries
-/.next/cache
-/.next/node_modules
+# next.js
+/.next/
 /out/
 /build
 

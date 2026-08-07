@@ -10,7 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to Server via SSH
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js Application
+        run: npm run build
+
+      - name: Deploy to Server via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: ".next,public,package.json,prisma"
+          target: "/home/sukrivas1/assertive-website"
+
+      - name: Restart Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -18,27 +45,9 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            # Load NVM so npm and pm2 commands work in non-interactive SSH
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            
-            # 1. Navigate to the project directory
             cd ~/assertive-website
-            
-            # 2. Pull the latest code from GitHub
-            git pull origin main
-            
-            # 3. Install dependencies
-            npm install
-            
-            # 4. Generate Prisma Client
-            npx prisma generate
-            
-            # 5. Push database schema changes (preserves existing data)
+            npm install --omit=dev
             npx prisma db push
-            
-            # 6. Build the Next.js application
-            npm run build
-            
-            # 7. Restart the PM2 process
             pm2 restart assertive-demo || pm2 start npm --name "assertive-demo" -- start
