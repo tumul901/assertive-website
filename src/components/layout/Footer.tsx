@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { PILLARS } from "@/lib/data/pillars";
-
-const PHONE = "+91 99536 80538";
-const PHONE_HREF = "tel:+919953680538";
-const EMAIL = "info@assertivebrand.co.in";
+// Not local copies. These were literals here until a number change had to
+// be made in three files at once and this one was nearly missed - which is
+// the exact failure contact.ts's own header warns about.
+import { PHONE, PHONE_HREF, EMAIL } from "@/lib/data/contact";
 
 const COMPANY_LINKS = [
   { label: "About", href: "/about" },
