@@ -17,12 +17,15 @@ export interface FlowOption {
  * Script for the WhatsApp widget's assistant.
  *
  * WHAT IS REAL AND WHAT IS NOT. The conversation is scripted - there is no
- * model behind it and no backend. What IS real is the ending: the handoff
- * opens wa.me against the actual business number with the answers already
- * written into the message, so a visitor who uses this lands in a genuine
- * WhatsApp thread with the company. Nothing is collected, stored or
- * silently dropped on the way there, which is the only version of a "we
- * will wire it up later" widget that is honest to ship in the meantime.
+ * model behind it. What IS real: the handoff opens wa.me against the
+ * actual business number with the answers already written into the
+ * message, so a visitor who uses this lands in a genuine WhatsApp thread
+ * with the company. The contact step (name + email, asked last) is also
+ * real - it POSTs to /api/leads and lands on the same admin page as the
+ * Enquiry form - but that save is best-effort: it never blocks or delays
+ * the WhatsApp handoff itself, so a backend hiccup costs a database row,
+ * never the one thing the visitor actually came for. See WhatsAppWidget's
+ * submitContact().
  *
  * NO CLAIMS. Same rule as faq.ts and stats.ts: nothing here may assert a
  * fact the site cannot support. Two things a WhatsApp mock reaches for by
@@ -43,11 +46,13 @@ export interface FlowOption {
 
 export const GREETING = [
   "Hi there 👋",
-  "This is the Assertive desk. Two questions, then I will hand you over on WhatsApp with your answers already written out.",
+  "This is the Assertive desk. A few quick questions, then I will hand you over on WhatsApp with your answers already written out.",
 ];
 
 export const ASK_EVENT = "What kind of event are you planning?";
 export const ASK_TIMING = "Roughly when is it?";
+export const ASK_CONTACT =
+  "Last thing - what's your name and email? Our team can reach you directly, even if this chat does not end up getting sent.";
 
 /** Offered alongside the five pillars, so nobody is forced into a bad fit. */
 export const OTHER_EVENT: FlowOption = {

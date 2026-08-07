@@ -6,8 +6,10 @@ import Link from "next/link";
 import { X, Send, CheckCheck } from "lucide-react";
 import { PILLARS } from "@/lib/data/pillars";
 import { PHONE } from "@/lib/data/contact";
+import { isValidEmail } from "@/lib/utils";
 import {
   ACK_OTHER,
+  ASK_CONTACT,
   ASK_EVENT,
   ASK_TIMING,
   EMAIL_FALLBACK,
@@ -25,10 +27,17 @@ import {
 /*
  * A WhatsApp-style assistant in the corner of the page. Scripted, not
  * intelligent - see whatsapp-flow.ts for what is real here and what is a
- * stand-in. The short version: the conversation is a three-step state
- * machine, and the ending is a genuine wa.me deep link to the real
- * business number, so this already works end to end for a visitor even
- * though the lead-capture backend does not exist yet.
+ * stand-in. The short version: the conversation is a four-step state
+ * machine (event, timing, contact, handoff), and the ending is a genuine
+ * wa.me deep link to the real business number, so this works end to end
+ * for a visitor regardless of what happens to the contact step's save.
+ *
+ * THE CONTACT STEP'S POST TO /api/leads IS FIRE-AND-FORGET ON PURPOSE -
+ * see submitContact(). It is awaited far enough to know it was sent, but
+ * its result never gates the state transition to the handoff step. A
+ * lead-capture widget that makes "can I reach WhatsApp" depend on "did
+ * the database write succeed" has its priorities backwards for a corner
+ * widget whose entire value proposition is the WhatsApp link.
  *
  * THE BUTTON IS AN <a>, NOT A <button>, and that is the whole no-JS
  * story. Its href is a real WhatsApp link; the click handler
@@ -97,6 +106,7 @@ export function WhatsAppWidget() {
   const [typing, setTyping] = useState(false);
   const [event, setEvent] = useState<Answer>(null);
   const [timing, setTiming] = useState<Answer>(null);
+  const [contact, setContact] = useState<{ name: string; email: string } | null>(null);
 
   const fabRef = useRef<HTMLAnchorElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -160,6 +170,36 @@ export function WhatsAppWidget() {
     // The pause before the reply is the whole illusion. It is also the
     // first thing to go under reduced motion: a deliberate wait is a
     // motion effect even though nothing moves during it.
+    setTyping(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(
+      () => {
+        setTyping(false);
+        setStep((s) => s + 1);
+      },
+      reduced() ? 0 : 750,
+    );
+  }
+
+  function submitContact(name: string, email: string) {
+    setContact({ name, email });
+
+    // Best-effort, not awaited by the state transition below - see the
+    // header comment. A failed fetch here is silently swallowed rather
+    // than surfaced, because there is nothing useful for the visitor to
+    // do about a background save failing; the handoff proceeds either way.
+    fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source: "whatsapp",
+        name,
+        email,
+        eventType: event?.label,
+        timing: timing?.label,
+      }),
+    }).catch(() => {});
+
     setTyping(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(
@@ -279,6 +319,16 @@ export function WhatsAppWidget() {
             {typing && step === 1 && <Typing />}
 
             {step >= 2 && (
+              <>
+                <Bubble from="bot">{ASK_CONTACT}</Bubble>
+                {step === 2 && !typing && <ContactForm onSubmit={submitContact} />}
+              </>
+            )}
+
+            {contact && <Bubble from="user">{`${contact.name} · ${contact.email}`}</Bubble>}
+            {typing && step === 2 && <Typing />}
+
+            {step >= 3 && (
               <>
                 {HANDOFF.map((line) => (
                   <Bubble key={line} from="bot">
@@ -424,6 +474,70 @@ function Options({
         </button>
       ))}
     </div>
+  );
+}
+
+/*
+ * The one free-text step in an otherwise tap-only flow - name and email
+ * are not the kind of thing Options' pill buttons can offer. Validated
+ * on submit, not on every keystroke: an error under an input the visitor
+ * has not finished typing into yet reads as the widget getting ahead of
+ * itself.
+ */
+function ContactForm({ onSubmit }: { onSubmit: (name: string, email: string) => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [touched, setTouched] = useState(false);
+
+  const valid = name.trim().length > 0 && isValidEmail(email);
+  const fieldStyle = {
+    backgroundColor: PANEL.chrome,
+    borderColor: PANEL.edge,
+    color: PANEL.ink,
+  };
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!valid) {
+      setTouched(true);
+      return;
+    }
+    onSubmit(name.trim(), email.trim());
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-1 flex w-full flex-col gap-2 self-end">
+      <input
+        type="text"
+        placeholder="Your name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        aria-label="Your name"
+        className="rounded-lg border px-3 py-2 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-1"
+        style={{ ...fieldStyle, outlineColor: PANEL.action }}
+      />
+      <input
+        type="email"
+        placeholder="Your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        aria-label="Your email"
+        className="rounded-lg border px-3 py-2 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-1"
+        style={{ ...fieldStyle, outlineColor: PANEL.action }}
+      />
+      {touched && !valid && (
+        <p className="text-xs" style={{ color: "#f15c6d" }}>
+          A name and a valid email are needed to continue.
+        </p>
+      )}
+      <button
+        type="submit"
+        className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{ backgroundColor: PANEL.action, outlineColor: PANEL.fab }}
+      >
+        Continue
+      </button>
+    </form>
   );
 }
 
