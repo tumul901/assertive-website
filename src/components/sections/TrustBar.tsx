@@ -22,7 +22,36 @@ import { Reveal } from "@/components/ui/Reveal";
  */
 export function TrustBar() {
   return (
-    <div className="relative z-10 px-6 lg:px-10">
+    /*
+      THE NAV TARGET, and it is on THIS element rather than on the card
+      for a measured reason.
+
+      "Clients" in the header and in the footer both resolve to
+      /#trusted-by and land here. Renaming the id breaks both silently - a
+      fragment matching nothing scrolls nowhere and throws nothing.
+
+      WHY NOT ON THE CARD. The card is inside Reveal, which enters from
+      translateY(24px). A fragment jump positions the target by its
+      rendered box, transform included - so the browser scrolls to a card
+      that is still sitting 24px low, the reveal then lifts it those 24px,
+      and the clearance this scroll-mt was asked to reserve is exactly
+      cancelled. Measured at 390px, with the id on the card: 24px of
+      requested air became a 0.1px overlap with the header. Desktop hid it,
+      because the header shrinks 110px -> 84px on the same scroll and hands
+      back 26px by luck.
+
+      This wrapper is outside Reveal, so it carries no transform - and the
+      -mt-16 on the Reveal collapses through it, so its top is the card's
+      top to the pixel (both measured at 71.9). Same landing point, immune
+      to the entrance animation.
+
+      scroll-mt clears the sticky header the way Enquiry's #enquiry target
+      does, plus 24px so the card is not flush against the header edge.
+    */
+    <div
+      id="trusted-by"
+      className="relative z-10 scroll-mt-[calc(var(--header-h)+24px)] px-6 lg:px-10"
+    >
       <Reveal className="mx-auto -mt-16 w-full max-w-[1180px]">
         <div className="flex flex-col items-center gap-6 rounded-lg bg-surface-raised px-6 py-8 shadow-bar sm:flex-row sm:gap-10 sm:px-10">
           <Eyebrow className="shrink-0 text-center sm:text-left">Trusted by</Eyebrow>

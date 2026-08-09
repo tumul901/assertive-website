@@ -69,9 +69,17 @@ export function Enquiry() {
   }
 
   return (
-    // id is the FAQ's "ask us directly" target. scroll-mt keeps the jump
-    // from landing under Header, which is sticky - --header-h is the same
+    // id is the target for the FAQ's "ask us directly", for the Enquiry
+    // item on the nav bar and for the discipline pages' closing CTA - it
+    // is the site's ONLY way of getting in touch besides the WhatsApp
+    // widget, so treat the id as public API. scroll-mt keeps the jump from
+    // landing under Header, which is sticky - --header-h is the same
     // live-measured value the pinned stages reserve against (tokens.css).
+    //
+    // Safe to sit on the Section itself, unlike the Trusted by anchor: the
+    // Reveals are INSIDE this element, so nothing transforms the box the
+    // browser scrolls to. See the long note in TrustBar.tsx for what
+    // happens when the target is inside a Reveal instead.
     <Section
       as="section"
       id="enquiry"

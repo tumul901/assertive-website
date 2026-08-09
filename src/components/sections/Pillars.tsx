@@ -79,7 +79,10 @@ function PillarCard({ pillar }: { pillar: Pillar }) {
   const Icon = pillar.icon;
   return (
     <Link
-      href={`/services#${pillar.id}`}
+      /* Was /services#<id>, an anchor into a section of the old catalogue
+         page. Each pillar has its own page now, so the card lands on it
+         rather than scrolling a hub. */
+      href={`/services/${pillar.id}`}
       /*
        * TRANSITION `translate` AND `scale`, NOT `transform`. Tailwind v4
        * builds -translate-y-* and scale-* out of the DISCRETE CSS

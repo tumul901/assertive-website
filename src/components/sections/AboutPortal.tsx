@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import Link from "next/link";
 import {
   useMotionTemplate,
   useMotionValueEvent,
@@ -9,7 +8,6 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { ArrowRight } from "lucide-react";
 import { useMotionStyles } from "@/lib/use-motion-styles";
 import { PETALS } from "@/lib/data/petals";
 
@@ -312,10 +310,26 @@ export function AboutPortal() {
   };
 
   return (
+    // #about IS THE NAV TARGET for "About Us" in the header and the footer,
+    // so treat this id as public API - the same footing #enquiry and
+    // #trusted-by are on.
+    //
+    // It anchors the TOP of the portal, deliberately, not the three
+    // paragraphs at the end of the timeline. Those paragraphs live in a
+    // layer that is absolutely positioned inside the sticky stage, so they
+    // have no scroll position of their own to aim at - and jumping past the
+    // portal would skip the whole sequence and leave the reader above it,
+    // able only to scroll backwards through a zoom playing in reverse.
+    // Landing here puts "About Us" and "Scroll to step inside" on screen,
+    // which is a legible arrival and keeps the section in the order it was
+    // built to be read.
+    //
+    // Safe to sit on this element: nothing here is inside a Reveal, so no
+    // transform shifts the box the browser scrolls to. See TrustBar.tsx.
     <div
       id="about"
       ref={wrapRef}
-      className="pin-wrap relative h-[360svh] motion-reduce:h-auto"
+      className="pin-wrap relative h-[360svh] scroll-mt-[var(--header-h)] motion-reduce:h-auto"
     >
       <div ref={stageRef} className="pin-stage">
         {/* ---- the field you fall into ----
@@ -458,15 +472,14 @@ export function AboutPortal() {
               ))}
             </div>
 
-            <Stratum p={p} at={[0.94, 1]}>
-              <Link
-                href="/about"
-                className="mt-10 inline-flex items-center gap-1.5 font-medium text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
-              >
-                Know More About Us
-                <ArrowRight size={16} aria-hidden="true" />
-              </Link>
-            </Stratum>
+            {/* The three strata ARE the About section - there is no
+                deeper page to send anyone to. A "Know More About Us"
+                link used to close this block; it pointed at /about,
+                which has never existed, so it was an invitation to a
+                404 sitting under the copy that already says the whole
+                thing. The last stratum lands at p=0.97, which leaves a
+                short beat of held stillness at the end of the timeline
+                where the link used to be. */}
           </div>
         </div>
       </div>

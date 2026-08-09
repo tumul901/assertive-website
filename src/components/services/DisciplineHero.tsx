@@ -9,37 +9,35 @@ import { Reveal } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
 import { PinwheelMark } from "@/components/brand/PinwheelMark";
 import type { PillarId } from "@/lib/data/pillars";
-import type { Service } from "@/lib/data/services";
 
 /*
+ * Was ServiceHero, and took a `service`. There are five service pages now,
+ * one per discipline, so it takes a pillar instead - the mark beside the
+ * title lights exactly the petal the page is about, which is the whole
+ * reason this component draws the mark rather than a photograph.
+ *
  * Deliberately NOT the `Pillar` type from pillars.ts. This component is
  * "use client", so `pillar` crosses the server -> client boundary as a
  * prop - and Pillar.icon is a LucideIcon (a function component), which
  * React cannot serialize across that boundary at all ("Functions cannot
  * be passed directly to Client Components"). This is the plain-data
- * subset ServiceHero actually reads; page.tsx builds one of these from a
+ * subset the hero actually reads; page.tsx builds one of these from a
  * real Pillar rather than passing the Pillar straight through.
  */
-interface PillarVisual {
+export interface PillarVisual {
   id: PillarId;
   name: string;
+  intro: string;
   ink: string;
   wash: string;
 }
 
-/*
- * ONE HERO FORMAT, PER-SERVICE DATA. Every /services/[slug] page renders
- * this same component; the only thing that changes across all 16 is the
- * `service` and `pillar` passed in from page.tsx. Do not fork this
- * component per service - a copy difference belongs in services.ts, not
- * in a new variant of this file.
- */
-export function ServiceHero({ service, pillar }: { service: Service; pillar: PillarVisual }) {
+export function DisciplineHero({ pillar }: { pillar: PillarVisual }) {
   return (
     <Section as="section" className="overflow-hidden bg-surface">
       {/*
         A centred PAIR, not a stretchy 1fr/420px grid. That was the actual
-        problem the last version had: on a wide viewport, an `1fr` text
+        problem an earlier version had: on a wide viewport, an `1fr` text
         column stretches edge to edge even though the text itself caps out
         at max-w-46ch, so the art ends up stranded near the right edge
         with a dead gap between it and the copy. justify-center keeps text
@@ -47,17 +45,17 @@ export function ServiceHero({ service, pillar }: { service: Service; pillar: Pil
         instead of pinned to opposite sides of it.
       */}
       <Container className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
-        <div className="lg:max-w-[480px]">
+        <div className="lg:max-w-[520px]">
           <Reveal>
-            <Eyebrow className={pillar.ink}>{pillar.name}</Eyebrow>
-            <h1 className="text-display mt-4 text-ink">{service.name}</h1>
+            <Eyebrow className={pillar.ink}>Discipline</Eyebrow>
+            <h1 className="text-display mt-4 text-ink">{pillar.name}</h1>
           </Reveal>
           <Reveal delay={0.08}>
-            <p className="text-body-lg mt-6 max-w-[46ch] text-ink-body">{service.blurb}</p>
+            <p className="text-body-lg mt-6 max-w-[54ch] text-ink-body">{pillar.intro}</p>
           </Reveal>
           <Reveal delay={0.16} className="mt-8">
             <Button href="/#enquiry" variant="primary">
-              Enquire About This Service
+              Enquire About {pillar.name}
             </Button>
           </Reveal>
         </div>
@@ -71,14 +69,11 @@ export function ServiceHero({ service, pillar }: { service: Service; pillar: Pil
 }
 
 /*
- * JUST THE MARK - no photo in this component. The photo lives beside the
- * description paragraph further down the page instead (see page.tsx and
- * imageFor() in services.ts): the hero pairs the title with the brand
- * mark, the description pairs the copy with a real photograph, and the
- * two do not share a box. An earlier version inset a photo into the mark
- * here and it did not read as intentional - two different pictures of
- * the same thing competing for one frame - so the pairing was split
- * across the two sections instead of layered into one.
+ * JUST THE MARK - no photo in this component, and no per-discipline
+ * photography exists to put here anyway (PLAN.md Appendix A item 2). The
+ * one petal this page is about blooms into colour; the other four stay
+ * hollow, which is the same argument the whole site makes in one image -
+ * five disciplines, one mark, and this is the one you are looking at.
  */
 function HeroArt({ pillar }: { pillar: PillarVisual }) {
   const reduce = useReducedMotion();

@@ -196,6 +196,66 @@
     animation: wa-bounce 1.1s infinite ease-in-out;
   }
 
+  /*
+   * SERVICE PILL CLOUD - ServicePills.tsx.
+   *
+   * THE AMBIENT FLOAT IS CSS, NOT A JAVASCRIPT ANIMATION LOOP, and that is
+   * the whole reason it lives here rather than in the component. The first
+   * version ran twenty-one concurrent Motion animations with
+   * `repeat: Infinity`, which is a main-thread frame callback per pill for
+   * as long as the page is open - on every one of the five discipline
+   * pages, whether or not anyone is looking at the cloud. These keyframes
+   * touch only `translate` and `rotate`, which the compositor can run off
+   * the main thread, so an idle cloud costs nothing at all.
+   *
+   * DISCRETE `translate` / `rotate`, NOT the `transform` shorthand, and
+   * that is load-bearing rather than stylistic: it leaves `transform`
+   * free for the pointer-magnet offset the component writes, so the two
+   * effects compose on ONE element instead of needing a wrapper each. Same
+   * property distinction Pillars.tsx documents for Tailwind v4's own
+   * translate/scale utilities. Writing this as `transform` keyframes would
+   * silently cancel the magnet - and only when the pointer moved.
+   *
+   * Every --pill-* custom property is set per pill, inline, from a hash of
+   * the service's index. No reduced-motion override is needed: the blanket
+   * rule at the bottom of this file already neutralises animation-duration
+   * on every element, and the component skips the magnet listener outright
+   * when the setting is on.
+   */
+  @keyframes pill-float {
+    0%,
+    100% {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+    25% {
+      translate: var(--pill-x) calc(-1 * var(--pill-y));
+      rotate: var(--pill-r);
+    }
+    50% {
+      translate: calc(-0.55 * var(--pill-x)) calc(0.45 * var(--pill-y));
+      rotate: 0deg;
+    }
+    75% {
+      translate: calc(-1 * var(--pill-x)) var(--pill-y);
+      rotate: calc(-1 * var(--pill-r));
+    }
+  }
+
+  .pill-float {
+    animation: pill-float var(--pill-dur) ease-in-out infinite;
+    /* NEGATIVE, so each pill starts life already partway through its own
+       cycle. A positive delay would have all twenty-one sitting still and
+       then setting off together, which is the exact synchronised pulse
+       the varied durations exist to avoid. */
+    animation-delay: var(--pill-delay);
+    transform: translate3d(var(--pill-mx, 0px), var(--pill-my, 0px), 0);
+    /* What turns per-frame custom-property writes into a soft trail rather
+       than a rigid lock to the cursor. Retargeting an in-flight transition
+       every frame is the point, not a bug: it low-passes the pointer. */
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .wa-log::-webkit-scrollbar {
     width: 6px;
   }

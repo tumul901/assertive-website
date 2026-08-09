@@ -8,11 +8,22 @@ import { PILLARS } from "@/lib/data/pillars";
 // the exact failure contact.ts's own header warns about.
 import { PHONE, PHONE_HREF, EMAIL } from "@/lib/data/contact";
 
+// About, Clients and Contact are in-page anchors, not pages. None of
+// /about, /clients or /contact was ever built, and all three have been
+// dropped from the header nav, which left these as the last links to them.
+// They point where the header points: the About portal (id in
+// AboutPortal.tsx), the Trusted by bar (TrustBar.tsx) and the enquiry form
+// (Enquiry.tsx), which is the site's only contact route besides the
+// WhatsApp widget.
+//
+// Careers is the one unbuilt route left in this list, deliberately - it is
+// the only entry here that would need a page with content nobody has
+// written yet, rather than a section that already exists on the homepage.
 const COMPANY_LINKS = [
-  { label: "About", href: "/about" },
-  { label: "Clients", href: "/clients" },
+  { label: "About", href: "/#about" },
+  { label: "Clients", href: "/#trusted-by" },
   { label: "Careers", href: "/careers" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contact", href: "/#enquiry" },
 ];
 
 // alt-only aria-labels; do NOT invent URLs (PLAN.md Phase 9) - href="#"
@@ -43,11 +54,34 @@ export function Footer() {
             height={50}
             className="h-9 w-auto"
           />
+          {/*
+            THE CLIENT'S OWN WORDS, VERBATIM - do not paraphrase or trim.
+            This replaced "Event management and brand communications, based
+            in Delhi.", which was written in-house as a stand-in.
+
+            Two elements rather than one paragraph with a line break,
+            because they are doing two different jobs: the first names the
+            category and reads as a descriptor under the logo, the second
+            is the sentence. The descriptor takes the full-strength footer
+            ink so it holds its own beside the wordmark; the sentence stays
+            muted, like the rest of the column text. Both tokens are
+            contrast-verified against the footer ground - see the note on
+            the component below.
+
+            max-w is in ch and sits on the sentence only: the descriptor is
+            short enough to never wrap on its own, and letting the sentence
+            run wider than about forty characters puts it out of step with
+            the link columns beside it.
+          */}
+          <p className="text-small mt-4 font-medium" style={{ color: "var(--color-footer-ink)" }}>
+            Experiential Events &amp; Brand Communications
+          </p>
           <p
-            className="text-small mt-4 max-w-[32ch]"
+            className="text-small mt-2 max-w-[38ch]"
             style={{ color: "var(--color-footer-muted)" }}
           >
-            Event management and brand communications, based in Delhi.
+            We create powerful experiences that connect brands with people and turn
+            moments into lasting impressions.
           </p>
         </div>
 
@@ -61,7 +95,7 @@ export function Footer() {
 
         <FooterColumn heading="Services">
           {PILLARS.map((pillar) => (
-            <FooterLink key={pillar.id} href={`/services#${pillar.id}`}>
+            <FooterLink key={pillar.id} href={`/services/${pillar.id}`}>
               {pillar.name}
             </FooterLink>
           ))}

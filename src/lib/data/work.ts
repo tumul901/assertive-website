@@ -15,8 +15,15 @@ export interface WorkItem {
   alt: string;
   /**
    * FURTHER photographs of the same event, lead excluded - the case-study
-   * carousel shows `[{image, alt}, ...gallery]`. Empty for all five today:
-   * we have exactly one real frame per event. See DEMO_FILL below.
+   * carousel shows `[{image, alt}, ...gallery]`.
+   *
+   * ALL FOURTEEN CARRY REAL GALLERIES NOW. wedding-social was the last
+   * holdout and was filled from the client's own Wedding Profile deck, so
+   * there is no longer any entry rendering a lone lead frame - and the
+   * DEMO_FILL borrowing mechanism that existed to paper over that has
+   * been deleted (see the note above galleryFor). An entry added here
+   * without photographs is still a legitimate state; it just renders a
+   * one-photo strip, which the carousel already handles.
    */
   gallery: Photo[];
   /** One factual line. Nothing here may assert scale, footfall or budget. */
@@ -41,151 +48,1042 @@ export interface WorkItem {
 }
 
 /*
- * The five events on the legacy homepage carousel, re-labelled from what
- * is actually visible IN the photographs rather than from the legacy
- * captions, which do not match their own images:
+ * NO ENTRY LEANS ON A LEGACY HOMEPAGE-CAROUSEL PHOTO ANY MORE. The last
+ * one was Wedding & Social, on sa.webp (shipped as
+ * /media/work/wedding.webp) - captioned "Wedding" by the legacy site,
+ * correctly a wedding set, but 370x351 and unrenderable above about
+ * 420 CSS px without visibly softening. It was logged as a launch blocker
+ * in Appendix A for that reason.
  *
- *   nsindia.webp   captioned "Nasdiya"    -> shows Amazon Music INDIA POD
- *                                            DAY, with IVM Podcasts and
- *                                            Westland Books branding
- *   e3.png         captioned "News18"     -> shows the AGENDA PASCHIM set,
- *                                            News18-branded
- *   sa.webp        captioned "Wedding"    -> a wedding set, correct
- *   clear.webp     captioned "Clear Trip" -> ACHIEVERS, AgentBox by
- *                                            Cleartrip
- *   e-formula.webp captioned "E formula"  -> INDIA DRIVES stage
+ * That blocker is CLEARED. The entry was rebuilt from the client's own
+ * "Wedding Profile" deck and now carries fifteen full-size frames of its
+ * own; wedding.webp is unreferenced, still on disk at
+ * public/media/work/wedding.webp. The rebuild also replaced the copy
+ * wholesale - see the long comment on that entry for why the old single-
+ * wedding story could not stand and what the deck actually shows.
  *
- * Two of these are directly corroborated by named testimonials in
- * PLAN.md section 3.4 (IVM Podcast / India Pod Day, News18 / Agenda
- * Paschim), so the photographs are the reliable source and the captions
- * are the defect. Raised in Appendix A - do not silently "correct" this
- * back to the legacy captions.
+ * Achievers used to sit in this same bucket - clear.webp, captioned "Clear
+ * Trip", correctly re-labelled ACHIEVERS / AgentBox by Cleartrip on
+ * photographic evidence alone, same 370x351 legacy file. Its own real
+ * gallery has since arrived (public/clear-trip-event-images/) and
+ * replaced clear.webp outright - see the inline comment on that entry
+ * below for what the photographs corroborated (the registration desk the
+ * legacy caption already half-described) and what they added that the
+ * deck's own Curatorial Scope text never mentioned (a Saudi Tourism
+ * Authority partnership visible on every backdrop). clear.webp is still on
+ * disk at public/media/work/cleartrip-achievers.webp, just unreferenced.
  *
- * Source files are 370x351. Never render one wider than about 420 CSS px:
- * beyond that they visibly soften. Real high-res masters are a launch
- * blocker (Appendix A).
+ * The other three below (India Pod Day, Agenda Paschim, India Drives) are
+ * not from this bucket either - all three used to be legacy slides and
+ * have since been replaced, in full or in part, with real client-supplied
+ * case studies, one per "Spectrum Spotlight" slide in the client's own
+ * pitch deck:
+ *
+ *   - India Pod Day (nsindia.webp, captioned "Nasdiya") -> Anko Managers
+ *     Meet 2026. Photographs entirely new (public/anko-meet-2026-images/).
+ *   - Agenda Paschim (e3.png, captioned "News18") -> Garuda Aerospace
+ *     ASCEND 2025. Photographs entirely new (public/garuda-event-images/).
+ *   - The legacy INDIA DRIVES slide (e-formula.webp, captioned "E
+ *     formula" - the same relabeling this comment used to flag) is now
+ *     India Drives below, with a real gallery
+ *     (public/formula-e-events-image/). Its legacy photo is what this
+ *     entry's copy was FIRST written against, and it turned out to be
+ *     genuine evidence of the same "India Drives" property - the new
+ *     photos show the identical stage lettering and folk performers.
+ *
+ *     But the deck's own Client & Venue slide (Ashoka Hotel, Delhi;
+ *     Chief Guest Hardeep Singh Puri; a physical car unveiling) does NOT
+ *     match what the real photographs, once they arrived, actually show:
+ *     an outdoor stage in front of HMDA and Government of Telangana
+ *     branding, built for "India Drives" as the curtain-raiser for
+ *     Formula-E's Hyderabad E-Prix, with no car and no named dignitary
+ *     in frame anywhere across ten photographs. Rather than force the
+ *     deck's Delhi/VIP narrative onto photographs that contradict it -
+ *     the exact mismatch this comment exists to catch - the copy was
+ *     rewritten a second time against the photographs, and the Ashoka
+ *     Hotel / Hardeep Singh Puri claims were dropped rather than kept.
+ *     They may both be true of some OTHER Formula-E / India Drives leg
+ *     Assertive ran; nothing here confirms or denies that, and nothing
+ *     should assert it either way without its own photographic evidence.
+ *
+ * None of the three testimonials this displaced (IVM Podcast / India Pod
+ * Day, News18 / Agenda Paschim - India Drives never had one) carries a
+ * slug reference into this file - the Testimonial type has no slug field
+ * at all - so none of this orphans a testimonial. Two of the three have
+ * since got a real WORK entry of their own anyway, below, under a NEW
+ * slug rather than the one they were originally displaced from:
+ *
+ *   - Agenda Paschim (News18) is not from this legacy set - it was added
+ *     directly from its own "Spectrum Spotlight" deck slide and its own
+ *     photographs (public/news-18-event-images/), with no legacy slide
+ *     behind it. Its name is a coincidence worth flagging, not a
+ *     correction: the wrong legacy GUESS two bullets up also read "Agenda
+ *     Paschim", for a different photo (e3.png, which turned out to be
+ *     Garuda's ASCEND slide) - it never had anything to do with News18's
+ *     own, separately-photographed show below. They only ever shared a
+ *     name.
+ *
+ *     Its pillar is "corporate", not "live" despite being a televised
+ *     show - the first cut of this entry used "live" for exactly that
+ *     reason, before PLAN.md Phase 8's testimonial-pillar mapping turned
+ *     up (testimonials.ts: "News18 -> corporate"). That mapping is
+ *     deliberate documented intent, not a default, so it wins over a
+ *     plausible-sounding guess made without having seen it.
+ *
+ *   - India Pod Day (IVM Podcasts) is also new below, but its legacy
+ *     photo was never a mismatch to correct - PLAN.md's Phase 4 notes
+ *     confirm nsindia.webp (captioned "Nasdiya") really was "an Amazon
+ *     Music / IVM Podcasts stage" all along, since renamed
+ *     india-pod-day.webp on disk. That photo was ORPHANED, not wrong,
+ *     when Anko's real content took the WORK[0] slot it used to sit in,
+ *     and stood in as this entry's lead for one round. IVM's own gallery
+ *     (public/iv-pod-event-images/) has since arrived with a sharper
+ *     photograph of the SAME stage (VNT_5895), so the legacy file is
+ *     retired rather than kept alongside a better copy of itself - it is
+ *     still on disk at public/media/work/india-pod-day.webp, just
+ *     unreferenced. Pillar "live", per the same PLAN.md mapping
+ *     ("IVM -> live").
  */
 export const WORK: WorkItem[] = [
   {
-    slug: "india-pod-day",
-    title: "India Pod Day",
-    client: "IVM Podcasts",
-    pillar: "live",
-    image: "/media/work/india-pod-day.webp",
-    alt: "The Amazon Music India Pod Day stage, lit magenta, with seven armchairs set for a panel",
-    gallery: [],
-    note: "Stage, set and show management for the Amazon Music podcast showcase.",
-    headline: "A Podcast Festival, Staged Like Live Television",
+    slug: "anko-managers-meet-2026",
+    title: "Anko Managers Meet 2026",
+    client: "Anko Sourcing",
+    pillar: "corporate",
+    image: "/anko-meet-2026-images/DSC06929.jpg",
+    alt: "Three panellists in conversation on the Thrive main stage at Grand Hyatt Manila, the full 'Making everyday living BRIGHTER' branding and the Kmart, Target and anko logos on screen behind them, the thrive26 stage signage in the foreground",
+    gallery: [
+      {
+        src: "/anko-meet-2026-images/DSC06188.jpg",
+        alt: "A speaker presents on the Thrive main stage at Grand Hyatt Manila, the Kmart, Target and anko logos above him and delegates seated at round tables in the foreground",
+      },
+      {
+        src: "/anko-meet-2026-images/DSC06864.jpg",
+        alt: "Four panellists in conversation on stage, one speaking into a handheld microphone as her close-up plays on the screen behind them",
+      },
+      {
+        src: "/anko-meet-2026-images/DSC06876.jpg",
+        alt: "The delegate audience seated at round tables across the ballroom, facing the stage during a panel session",
+      },
+      {
+        src: "/anko-meet-2026-images/DSC06968.jpg",
+        alt: "The full delegation gathered on and around the stage for a group photograph, the event's branded signage set up in front of them",
+      },
+    ],
+    note: "Conference production and on-ground delivery for Anko Sourcing's Thrive leadership meet at Grand Hyatt Manila.",
+    headline: "A Sourcing Summit That Left The Ballroom",
     problem:
-      "Podcasting is an audio medium with no natural stage presence. India Pod Day had to work twice over - as a live event for the audience in the room, and as a set that would still read on camera in everything cut from it afterwards.",
+      "Anko Sourcing's annual leadership meet was bringing in sourcing managers from across Asia and Australia for strategic planning and alignment, not a standard run of keynotes. The brief paired a conference programme of panels and education with a multi-day itinerary that also had to move the same leadership group out to stores across Manila.",
     solution:
-      "We built a panel set that holds up from every angle a camera could take it from, lit magenta so the brand reads even in a wide shot, and ran the day to broadcast timings so recording, audience changeover and stage resets never collided.",
+      "We produced the main-stage programme end to end - branded set and screens, keynote and panel sessions, a networking reception - and ran the logistics behind it, so the itinerary carried straight through from the opening session to the store visits without the delegates managing any of it themselves.",
     impact:
-      "The showcase ran as one continuous programme rather than a series of separate recordings, and came away with a stage that photographed as well as it sounded.",
+      "The programme held its shape from the first panel to the last store visit, and closed with the full delegation together on stage for one photograph.",
   },
   {
-    slug: "agenda-paschim",
-    title: "Agenda Paschim",
-    client: "News18 Network",
+    slug: "ascend-2025",
+    title: "ASCEND 2025",
+    client: "Garuda Aerospace",
     pillar: "corporate",
-    image: "/media/work/agenda-paschim.png",
-    alt: "The News18 Agenda Paschim conclave set, a red and gold backdrop behind a panel seating arrangement",
-    gallery: [],
-    note: "Conclave set design and floor management for the News18 regional summit.",
-    headline: "A Regional Conclave With National Polish",
+    image: "/garuda-event-images/1O0A9424.JPG",
+    alt: "The empty ASCEND 2025 main stage at The Taj Lands End, Mumbai, three screens carrying the Garuda Aerospace ASCEND 2025 branding and the tagline 'A Movement Towards The Future' above rows of blue-draped banquet tables",
+    gallery: [
+      {
+        src: "/garuda-event-images/1O0A9443.JPG",
+        alt: "A table stacked with ASCEND 2025 participant lanyards and badges ahead of registration",
+      },
+      {
+        src: "/garuda-event-images/1O0A9512.JPG",
+        alt: "A speaker addresses the room from the ASCEND 2025 podium, a lit ceremonial lamp and four empty panel chairs set up behind him",
+      },
+      {
+        src: "/garuda-event-images/1O0A9429.JPG",
+        alt: "The Garuda Aerospace ASCEND 2025 stage and branded signage, photographed from front of house",
+      },
+      {
+        src: "/garuda-event-images/1O0A9427.JPG",
+        alt: "A speaker presents Garuda Aerospace's Kisan Drone Yatra programme on the main screen, showing a farmer and drone graphic in the Indian tricolour",
+      },
+      {
+        src: "/garuda-event-images/1O0A9559.JPG",
+        alt: "A moderator and three panellists in conversation on stage, a lit ceremonial lamp beside them",
+      },
+      {
+        src: "/garuda-event-images/1O0A9562.JPG",
+        alt: "The full ASCEND 2025 audience seated at numbered round tables, facing the panel discussion on stage",
+      },
+      {
+        src: "/garuda-event-images/1O0A9575.JPG",
+        alt: "Delegates including uniformed Indian Navy officers seated in the audience, ASCEND-branded notebooks on the table in front of them",
+      },
+      {
+        src: "/garuda-event-images/1O0A9425.JPG",
+        alt: "The Garuda Aerospace ASCEND 2025 stage, screens lit and ready ahead of the programme",
+      },
+    ],
+    note: "Stage production and event management for Garuda Aerospace's ASCEND unveiling at The Taj Lands End, Mumbai.",
+    headline: "An Unveiling That Opened With A Traditional Lamp",
     problem:
-      "A news conclave lives or dies on its optics. Agenda Paschim needed a set carrying the authority of the network's national programming, built to a regional summit's schedule and travelling to its venue.",
+      "Garuda Aerospace's ASCEND was built to unveil its DaaS leadership and its drone fleet to stakeholders who needed to see more than a product demo. The room included uniformed Navy officers alongside industry delegates, which meant the staging had to carry the weight of a formal unveiling, not a trade-show booth.",
     solution:
-      "A modular red-and-gold set drawn from the channel's on-air identity, with a seating plan that keeps every wide shot populated and a floor process that moves speakers on and off between segments without breaking the recording.",
+      "We produced the stage end to end - a three-screen branded set, technical direction and the show itself, opened with a traditional lamp-lighting before moving into keynote and panel sessions - and ran registration and floor management for a full house of delegates and dignitaries.",
     impact:
-      "The conclave held its published running order from first session to last, and the set carried the network's look consistently across every panel staged on it.",
+      "ASCEND opened to a full room, carried its ceremony and its content without a seam between them, and closed having put Garuda Aerospace's leadership in front of the stakeholders - military and civilian - it was there to reach.",
   },
   {
     slug: "achievers",
     title: "Achievers",
     client: "Cleartrip",
     pillar: "corporate",
-    image: "/media/work/cleartrip-achievers.webp",
-    alt: "The Achievers registration desk, staffed by four hosts in front of a purple branded backdrop",
-    gallery: [],
-    note: "Registration, hosting and on-ground delivery for the AgentBox partner awards.",
-    headline: "An Awards Night That Starts At The Door",
+    /*
+     * Real photographs now (public/clear-trip-event-images/) - the legacy
+     * cleartrip-achievers.webp described this exact scene (a registration
+     * desk, four hosts, purple branded backdrop) and 0U7A9845 below is that
+     * same setup, sharper. Every one of the six frames supplied also
+     * carries "Powered by Saudi, Welcome to Arabia" branding, a backdrop
+     * cut into the shape of Saudi Arabia around Al Masmak Fort, and a
+     * Riyadh Season fireworks reel played on the main stage screen at
+     * night - a Saudi Tourism Authority partnership the deck's own
+     * Curatorial Scope text never mentioned. It does not contradict the
+     * deck's stated theme, "Elevation" (kept below, nothing here argues
+     * against it) - it is a real layer the deck left out and the
+     * photographs are the only reason this entry now says it.
+     */
+    image: "/clear-trip-event-images/0U7A9845.JPG",
+    alt: "Four hosts seated behind the Achievers Night registration desk, the AgentBox by Cleartrip and 'Powered by Saudi, Welcome to Arabia' branding on the backdrop behind them, red-roped queue stanchions in front",
+    gallery: [
+      {
+        src: "/clear-trip-event-images/0U7A9848.JPG",
+        alt: "A branded backdrop cut into the shape of Saudi Arabia showing Al Masmak Fort in Riyadh, '#visitsaudi' beside the Achievers Night and AgentBox by Cleartrip logos",
+      },
+      {
+        src: "/clear-trip-event-images/0U7A9857.JPG",
+        alt: "The Achievers Night photo-op backdrop, a round turntable stage set in front of two branded panels reading 'AgentBox by Cleartrip presents Achievers Night, powered by Saudi, Welcome to Arabia'",
+      },
+      {
+        src: "/clear-trip-event-images/0U7A9862.JPG",
+        alt: "The empty outdoor Achievers Night stage before the show, a full lighting truss overhead and a round dinner table set on the lawn in the foreground",
+      },
+      {
+        src: "/clear-trip-event-images/0U7A9891.JPG",
+        alt: "The Achievers Night stage at night, a Riyadh Season fireworks reel playing on the main screen between the branded side panels",
+      },
+      {
+        src: "/clear-trip-event-images/0U7A9892.JPG",
+        alt: "The Achievers Night stage at night, the screen reading 'Closed Culture' ahead of that segment of the show",
+      },
+    ],
+    note: "Stagecraft, hospitality management and event production for 'Achievers Night', Cleartrip's AgentBox gala dinner at The Leela Hotel, Noida, presented with Saudi Tourism Authority.",
+    headline: "A Recognition Gala Staged Against The Shape Of Saudi Arabia",
     problem:
-      "AgentBox partners arrive from across the country inside one narrow window. On a partner awards night the door is the first thing anyone experiences, and a queue there sets the tone for the whole evening.",
+      "Cleartrip's 'Achievers Night' had to work as both a recognition ceremony for its top-tier management and global delegates and a showcase for Saudi Tourism Authority's 'Welcome to Arabia' campaign, carried across every branded surface in the room - without the evening reading as an awards show with someone else's advertisement behind it.",
     solution:
-      "A registration line built for throughput rather than decoration - credentials prepared ahead, four host positions working in parallel, and the branded backdrop placed so that even the queue reads as part of the event in photographs.",
+      "We built and staged the gala end to end - the outdoor registration entrance, the branded backdrops and destination-shaped photo wall carrying 'Welcome to Arabia', and the main stage itself, with a live Saudi tourism reel worked into the same lighting and AV rig running the award segments.",
     impact:
-      "Guests moved from the door to their tables without a bottleneck, and the programme opened to a room that was already seated.",
+      "The campaign ran from the registration desk to the main stage as part of the same show, so the recognition ceremony and the destination showcase read as one evening rather than a ceremony with an advertisement running behind it.",
   },
   {
     slug: "india-drives",
     title: "India Drives",
-    client: null,
+    client: "Formula-E",
     pillar: "live",
-    image: "/media/work/india-drives.webp",
-    alt: "Folk dancers in yellow and orange performing in front of a large illuminated LED stage",
-    gallery: [],
-    note: "Live performance programming and stage production.",
-    headline: "Folk Tradition On A Broadcast Stage",
+    image: "/formula-e-events-image/8D3A5481.JPG",
+    /*
+     * Digits in this one alt, deliberately: it is transcribing the actual
+     * on-screen campaign name, not asserting a metric of our own the way
+     * `note`/`headline`/`problem`/`solution`/`impact` are forbidden to
+     * (see the interface comment on WorkItem). Alt text describes what a
+     * photo shows; "100 Days To Net Zero" is what this one shows.
+     */
+    alt: "The India Drives stage at night, a performer striking a garlanded ceremonial gong flanked by two Kathakali dancers in full costume, 'Formula E', 'hmda' and '100 Days To Net Zero, Accelerated By Greenko' lit on the flanking screens",
+    gallery: [
+      {
+        src: "/formula-e-events-image/8D3A5396.JPG",
+        alt: "The empty India Drives stage before the show, twin screens carrying a Formula E car and the '100 Days To Net Zero' countdown branding above the lit India Drives lettering on the lawn",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5466.JPG",
+        alt: "Folk performers and drummers converge on the central gong under a lit floral screen backdrop, the India Drives lettering lit up in the foreground",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5467.JPG",
+        alt: "Two lead performers in Punjabi folk dress dance in front of the ceremonial gong, the HMDA, Government of Telangana and Greenko branding visible on the screen behind them",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5469.JPG",
+        alt: "A wider ensemble of folk musicians - dhol, string and hand-cymbal players - gathered around the garlanded gong mid-performance",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5470.JPG",
+        alt: "Dhol and horn players in mid-performance, one holding a drum aloft, lit in gold against the screen's mandala pattern",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5477.JPG",
+        alt: "Kathakali dancers visible on stage behind a foreground of drummers in motion, a floral centrepiece and glassware on a VIP table in the foreground",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5478.JPG",
+        alt: "Two Kathakali dancers in full traditional costume and makeup flank a performer striking the ceremonial gong, the India Drives lettering lit up below the stage",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5480.JPG",
+        alt: "The same ceremonial gong-strike lit in blue, the Ace Nxt Gen, HMDA and Greenko logos visible on the screen behind the performers",
+      },
+      {
+        src: "/formula-e-events-image/8D3A5471.JPG",
+        alt: "The full folk ensemble on stage and on the lawn around the India Drives lettering, drummers mid-step in the foreground",
+      },
+    ],
+    note: "Stage production and live folk performance for 'India Drives', Formula-E's countdown campaign toward net zero, staged with HMDA, the Government of Telangana and Greenko.",
+    headline: "A Net-Zero Countdown Opened On A Ceremonial Gong",
     problem:
-      "The opening had to read as unmistakably Indian without tipping into tourism-brochure shorthand, on a stage whose scale and LED wall were built for a very different kind of act.",
+      "India Drives was built to open Formula-E's countdown toward net zero, staged jointly with HMDA, the Government of Telangana and Greenko - which meant the launch had to read as a genuine event in its own right, not a countdown clock and a row of sponsor logos on an otherwise empty stage.",
     solution:
-      "Live folk performance programmed against the lighting and screen cues rather than in front of them, so the choreography and the stage move as a single piece and the wall works as part of the costume, not as wallpaper behind it.",
+      "We built the outdoor stage and lighting rig end to end and opened the countdown with a live folk performance - dhol, regional drummers and a full Kathakali pair among them - staged around a garlanded ceremonial gong, so the launch had a real ceremony to anchor it before the branding and the countdown took over the screens.",
     impact:
-      "The opening set the register for everything that followed on the stage that night, and gave the event its most-used sequence of footage.",
+      "The countdown opened on a stage that was already a show in its own right - a folk ensemble and a ceremonial gong-strike ahead of the branding - rather than a screen switching on in front of an empty lawn.",
   },
   {
     slug: "wedding-social",
-    title: "Wedding & Social",
+    title: "Wedding Design Library",
     client: null,
     pillar: "weddings",
-    image: "/media/work/wedding.webp",
-    alt: "A large illuminated wedding set built as an ornate palace facade, with tiered seating in front",
-    gallery: [],
-    note: "Set construction, lighting and guest experience for a large-format wedding.",
-    headline: "A Palace Built To Stand For One Night",
+    /*
+     * REPLACED WHOLESALE, AND THE STORY CHANGED WITH IT. This entry used
+     * to be a single invented wedding - "A Palace Built To Stand For One
+     * Night", a sectional palace facade trucked in and struck over a
+     * weekend - written against the one legacy photograph
+     * (/media/work/wedding.webp, 370x351, the last of the low-res legacy
+     * slides) because nothing else existed. The client read it and said
+     * it looked made up, which it was: no palace build is documented
+     * anywhere, and the copy was reverse-engineered from a thumbnail.
+     *
+     * The real source is the client's own "Wedding Profile" deck, slides
+     * seven to twenty-one, and it is not one wedding at all - it is a
+     * THEME LIBRARY. Three slides cover the paper and gifting layer
+     * (invitations, couple monograms, welcome hampers), ten cover named
+     * decor themes (Rajasthani, South Indian, Punjabi, Bollywood,
+     * Contemporary, Peacock, Vintage Garden, Mari Gold, Nautica,
+     * Royalista), and two cover technical and arrival production (LED,
+     * Special Entry). The copy below argues that range, because that is
+     * what the evidence actually shows. Do not re-narrow it into one
+     * event.
+     *
+     * WATERMARKS ARE DELIBERATE AND CLIENT-APPROVED. Every frame carries
+     * a visible "Magic Box Entertainment" watermark - a different
+     * company's mark on photographs of this work. Work was stopped when
+     * that was found and the question put to the client, who confirmed
+     * these are usable as they stand, watermark included. Left in rather
+     * than cropped or cloned out: removing another company's mark from a
+     * photograph is a different decision from being allowed to publish
+     * it, and nobody has asked for that one. A future maintainer seeing a
+     * competitor's watermark here is looking at an approved state, not an
+     * accident - check with the client before "fixing" it.
+     *
+     * The lead is the Contemporary slide, the only frame in the whole set
+     * with the couple actually in it, on the same reasoning Campa's lead
+     * was picked: choose the frame that shows the thing working for real
+     * people over the more spectacular empty set. Royalista and Vintage
+     * Garden are the more dramatic images and they sit high in the
+     * gallery instead.
+     *
+     * These are COMPOSITE SLIDES, not single photographs - each is a
+     * four-up collage inside the deck's decorative border with the theme
+     * name set in a medallion. The alt text below describes what is in
+     * the collage rather than pretending each is one picture.
+     */
+    image: "/wedding-event-images/wedding-theme-contemporary.jpeg",
+    alt: "The Contemporary theme - a couple walking into a wedding through an illuminated arch of white blossom and crystal strands, alongside an ivory mirrored stage, spun-thread globes with magenta blooms among red candles, and a caged orchid centrepiece",
+    gallery: [
+      { src: "/wedding-event-images/wedding-theme-royalista.jpeg", alt: "The Royalista theme - ceilings hung dense with crystal strand chandeliers and warm bulbs, a mirrored entrance corridor banked with flowers, a red bar under a canopy of crystal, and a red-draped band stage rigged with arch lighting" },
+      { src: "/wedding-event-images/wedding-theme-vintage-garden.jpeg", alt: "The Vintage Garden theme - a mandap hung with cascading pink blossom over a carved white seat, a green foliage entrance walkway, a floral topiary stage, and a wedding cake table framed by hanging blossom columns" },
+      { src: "/wedding-event-images/wedding-theme-marigold.jpeg", alt: "The Marigold theme - marigold garlands strung as a dome over a lit mandap, a rangoli of loose marigold heads with cane pots, a marigold-curtained entrance, and dense orange garland columns behind a ceremonial vessel" },
+      { src: "/wedding-event-images/wedding-theme-rajasthani.jpeg", alt: "The Rajasthani theme - a marigold-garlanded bicycle, a puppet figure beside a pink and orange fabric corridor, folk drummers in traditional dress, and a marigold and fabric canopy" },
+      { src: "/wedding-event-images/wedding-theme-south-indian.jpeg", alt: "The South Indian theme - a banana-leaf backdrop with a marigold floor motif, hanging marigold and jasmine strands, a garlanded ceremonial swing, and a brass vessel dressed with flowers" },
+      { src: "/wedding-event-images/wedding-theme-punjabi.jpeg", alt: "The Punjabi theme - a hand-painted truck built as a bar, a mehendi seating stage in fuchsia and green drape, a bhangra troupe with dhol players mid-performance, and a marquee floor laid with bolsters and rugs" },
+      { src: "/wedding-event-images/wedding-theme-bollywood.jpeg", alt: "The Bollywood theme - a kitsch-styled lounge of film props and painted panels, a red velvet stage with gold arches and a lit tiered runway, a red-carpet entrance flanked by cut-out figures holding film reels, and a giant lit star backdrop for a Bollywood Night" },
+      { src: "/wedding-event-images/wedding-theme-peacock.jpeg", alt: "The Peacock theme - a mandap backed by a full peacock tail with a gilded seat, a ballroom walled in living green with hanging lantern chandeliers, and a peacock sculpted entirely from flowers standing beside the aisle" },
+      { src: "/wedding-event-images/wedding-theme-nautica.jpeg", alt: "The Nautica theme - a walkway of polka dots, paper lanterns and chalkboard signs, coral and green banquet tables laid for dinner, crate-and-bloom centrepieces with star lanterns, and a band stage draped in silver stars" },
+      { src: "/wedding-event-images/wedding-invites.jpeg", alt: "Invitation design - boxed and cased invitations and printed cards in red, gold and teal, each set built around its own couple's wedding branding" },
+      { src: "/wedding-event-images/wedding-logos.jpeg", alt: "Wedding logo design - couple monograms and crests drawn per wedding, several built around peacock and feather motifs and set with the wedding date" },
+      { src: "/wedding-event-images/wedding-welcome-hampers.jpeg", alt: "Welcome hampers - dry-fruit baskets, a black gift box dressed with flowers, a green and gold hamper and a woven basket packed with a bottle, made up for guests on arrival" },
+      { src: "/wedding-event-images/wedding-led.jpeg", alt: "LED and technical production - a lit dance floor under a rigged truss, an illuminated bar front, LED panel walls framing an entrance, and a ballroom washed red behind a glittering strand backdrop" },
+      { src: "/wedding-event-images/wedding-special-entry.jpeg", alt: "Special entry - a flower-dressed cycle rickshaw, a couple driving in on a floral-banked buggy, a lit and garlanded auto-rickshaw on a red carpet, and an open wedding chariot cart trimmed with orchids" },
+    ],
+    note: "Wedding design and production across a library of worked themes - invitations, couple monograms and welcome hampers through to decor, floral, lighting, LED and the couple's arrival.",
+    headline: "Pick The Aesthetic. The Invitation, The Mandap And The Arrival Follow.",
     problem:
-      "The brief asked for a facade with the presence of a real building - at a scale that still had to be trucked in, built, lit, used and struck inside a single weekend.",
+      "A wedding brief almost never arrives as a single aesthetic. One function wants folk-traditional, the next something pared back and contemporary - and the invitation, the monogram, the hamper, the decor and the arrival are each usually bought from a different supplier who never sees anyone else's work.",
     solution:
-      "A sectional palace set engineered around the load-in and lit to hold its detail all the way to the top of the frame, with tiered seating placed so guests read the whole facade from where they are sitting rather than only the middle of it.",
+      "We keep the whole of it in-house and design it as one language. The theme is chosen from a library we have already built rather than described in the abstract - Rajasthani, South Indian, Punjabi, Bollywood, Peacock, Marigold, Vintage Garden, Nautica, Royalista or contemporary - and everything else is made to it: the invitations and monogram, the hampers, the mandap, the floral and lighting design, and the vehicle the couple arrives on.",
     impact:
-      "The set carried the ceremony as its backdrop and the reception as its centrepiece, and came down on schedule the next morning.",
+      "A family choosing between aesthetics is choosing between things we have already built, not renderings - and whichever they pick, the invitation, the hamper and the entrance all carry the same design.",
+  },
+  {
+    slug: "agenda-paschim",
+    title: "Agenda Paschim",
+    client: "News18",
+    // "corporate", not "live" - see the top-of-file comment. Aligned to
+    // PLAN.md Phase 8's testimonial-pillar mapping, discovered after this
+    // entry's first cut guessed "live" from the pillar's own "televised
+    // shows" blurb.
+    pillar: "corporate",
+    image: "/news-18-event-images/IMG_7510.JPG",
+    alt: "A guest and a News18 anchor in conversation on the Agenda Paschim set, the show's branding and an illustrated monument backdrop lit in red and gold behind them",
+    gallery: [
+      {
+        src: "/news-18-event-images/IMG_6971.JPG",
+        alt: "A step-and-repeat backdrop tiled with the News18 Uttar Pradesh Uttarakhand and Agenda Paschim logos ahead of the show",
+      },
+      {
+        src: "/news-18-event-images/IMG_6979.JPG",
+        alt: "The empty Agenda Paschim stage before the show, four panel chairs and a podium set against the branded red backdrop, audience seating still empty in the foreground",
+      },
+      {
+        src: "/news-18-event-images/IMG_7501.JPG",
+        alt: "A News18 anchor mid-introduction at the Agenda Paschim podium",
+      },
+      {
+        src: "/news-18-event-images/IMG_7056.JPG",
+        alt: "The full seated audience watching the panel on stage, a broadcast camera crane overhead and a uniformed security officer among the crowd, the screens reading 'Jawab Haazir Hai'",
+      },
+      {
+        src: "/news-18-event-images/IMG_7287.JPG",
+        alt: "Two panellists in conversation on the Agenda Paschim set, microphones in hand",
+      },
+      {
+        src: "/news-18-event-images/IMG_7420.JPG",
+        alt: "Three panellists in conversation on stage, that episode's debate headline lit up in Hindi on the screen behind them",
+      },
+      {
+        src: "/news-18-event-images/IMG_7459.JPG",
+        alt: "A candid moment between segments, hosts and crew crossing the stage as the screen changes to the next headline",
+      },
+    ],
+    note: "Technical production and security coordination for News18's live televised debate show 'Agenda Paschim' at Jaypee Greens Resort.",
+    headline: "A Televised Debate Built For Zero Retakes",
+    problem:
+      "News18's 'Agenda Paschim' is a live televised debate, recorded in front of a full audience at Jaypee Greens Resort and broadcast the moment it happens - there is no retake once the cameras roll, and no margin for a technical fault, a mistimed cue or a security lapse to show up on air.",
+    solution:
+      "We built and ran the debate board itself - the podium set, the technical setup behind a live broadcast, and security coordination for a televised audience of that size - and treated the recording the way a live broadcast has to be treated: everything rehearsed and positioned before transmission, nothing left to be caught live.",
+    impact:
+      "The debate went to air clean, on schedule and without incident, in an environment where a single visible fault would have been broadcast along with everything else.",
+  },
+  {
+    slug: "india-pod-day",
+    title: "India Pod Day",
+    client: "IVM Podcasts",
+    pillar: "live",
+    /*
+     * Real gallery now (public/iv-pod-event-images/) - see the top-of-file
+     * comment for where the legacy india-pod-day.webp came from. That
+     * photo was the empty main stage from further away and lower
+     * resolution; VNT_5895 below is the same stage, properly - the legacy
+     * frame is retired rather than kept alongside a sharper copy of
+     * itself, unlike India Drives (a genuinely different photo) or
+     * Achievers/Wedding & Social (still nothing else to show).
+     */
+    image: "/iv-pod-event-images/VNT_5895.JPG",
+    alt: "The empty India Pod Day main stage, six chairs and side tables in a row beneath a full lighting truss, the 'amazon music presents India Pod Day' branding lit on the screen behind them",
+    gallery: [
+      {
+        src: "/iv-pod-event-images/VNT_5821.JPG",
+        alt: "The India Pod Day entrance arch, Amazon Music, IVM Podcasts and Westland Books branding on both sides of the stairway into the venue",
+      },
+      {
+        src: "/iv-pod-event-images/VNT_5843.JPG",
+        alt: "The India Pod Day step-and-repeat wall, the Amazon Music, IVM Podcasts and Westland Books logos lit up in purple",
+      },
+      {
+        src: "/iv-pod-event-images/VNT_5840.JPG",
+        alt: "Two lounge chairs set for a one-on-one conversation against a smaller branded backdrop, away from the main stage",
+      },
+      {
+        src: "/iv-pod-event-images/VNT_5823.JPG",
+        alt: "The full step-and-repeat wall tiled with the India Pod Day logo, photographed from further back",
+      },
+      {
+        src: "/iv-pod-event-images/VNT_5842.JPG",
+        alt: "The venue before the show, the step-and-repeat wall and the lounge seating corner both visible in one wide shot",
+      },
+      {
+        src: "/iv-pod-event-images/VNT_5905.JPG",
+        alt: "A host mid-introduction at the India Pod Day podium",
+      },
+      {
+        src: "/iv-pod-event-images/DSC_3484.JPG",
+        alt: "A guest speaker seated on stage, microphone in hand, against the branded backdrop",
+      },
+      {
+        src: "/iv-pod-event-images/DSC_3581.JPG",
+        alt: "Javed Akhtar mid-conversation on stage, microphone in hand",
+      },
+      {
+        src: "/iv-pod-event-images/VNT_5828.JPG",
+        alt: "Stacked copies of Javed Akhtar's 'Talking Life', in conversation with Nasreen Munni Kabir, displayed at the event",
+      },
+    ],
+    note: "Stage design and experiential branding for IVM Podcasts' 'India Pod Day', presented with Amazon Music and Westland Books, at Saint Andrews, Mumbai.",
+    headline: "A Flagship Podcast Day Staged Like A Festival",
+    problem:
+      "IVM Podcasts' 'India Pod Day' was pitched as Amazon Music's flagship gathering of India's top audio creators and industry leaders, with sessions built around a marquee appearance from Javed Akhtar and filmed as a televised event in its own right. It had to read as a cultural event across the whole venue, and hold together on camera across back-to-back sessions.",
+    solution:
+      "We designed and built the stage, the entrance arch and the branded backdrops across the venue, and ran the technical side of a day built on multiple back-to-back speaker sessions - seamless A/V transitions between them so the programme, and the footage, moved from one conversation to the next without a visible reset.",
+    impact:
+      "India Pod Day carried its flagship billing from the branded arrival experience through to its marquee session with Javed Akhtar, filmed and delivered as the clean televised event it was billed to be.",
+  },
+  {
+    slug: "maxellerate",
+    title: "Maxellerate",
+    client: "Montra Electric",
+    pillar: "corporate",
+    /*
+     * Real photographs from day one (public/montra-electric-event-images/)
+     * - no legacy slide behind this entry, added directly from its own
+     * "Spectrum Spotlight" deck slide and its own photographs, the same
+     * way Agenda Paschim and India Pod Day were. Renamed on arrival: six
+     * of the seven source files carried a " (1)" suffix with a literal
+     * space and parentheses (duplicate-download artefacts), which is the
+     * kind of filename a Linux path can mangle on deploy - stripped down
+     * to the plain camera names. The other two had no space problem but
+     * were named after their upload UUID; those two got real names
+     * instead (maxellerate-podium.jpg, maxellerate-formation.png).
+     *
+     * The lead is the aerial formation shot, not an establishing stage
+     * shot like most other entries here - it earns the spot: the
+     * delegation was arranged into a winged shape that echoes the Montra
+     * Electric logo mark visible on every stage screen in the rest of
+     * this gallery, and it is the single most distinctive photograph
+     * supplied this session.
+     */
+    image: "/montra-electric-event-images/maxellerate-formation.png",
+    alt: "The full Maxellerate workforce arranged into a giant winged formation on an open field, the shape echoing the Montra Electric logo's wing mark, photographed directly overhead",
+    gallery: [
+      {
+        src: "/montra-electric-event-images/_DSC8938.jpg",
+        alt: "The empty Maxellerate stage before the show, the 'I'm Samvad '26' and 'Maxellerate, it's now or never' branding lit across the screens, red-bowed banquet tables set in the foreground",
+      },
+      {
+        src: "/montra-electric-event-images/0D1A2745.jpg",
+        alt: "The same stage lit for the show, 'I'm Samvad '26' on the main screen and 'Maxellerate, it's now or never' on the floor screen at the foot of the stairs",
+      },
+      {
+        src: "/montra-electric-event-images/_DSC9024.jpg",
+        alt: "A speaker addresses the seated delegation from the podium, the audience in matching 'I'm Samvad' polo shirts with red bows tied to their chairs",
+      },
+      {
+        src: "/montra-electric-event-images/maxellerate-podium.jpg",
+        alt: "A speaker presents centre stage, the full seated delegation facing the stage from behind",
+      },
+      {
+        src: "/montra-electric-event-images/_DSC9051.jpg",
+        alt: "The packed room during a session, delegates seated at red-draped tables facing the Maxellerate stage",
+      },
+      {
+        src: "/montra-electric-event-images/_DSC9644.jpg",
+        alt: "A panel of speakers seated together on stage, addressing the full delegation",
+      },
+    ],
+    note: "Stage production and event management for Montra Electric's 'I'm Samvad '26' annual conference, themed 'Maxellerate - It's Now Or Never'.",
+    headline: "A Conference That Closed With The Workforce Shaped Into Its Own Logo",
+    problem:
+      "Montra Electric's 'I'm Samvad '26' was built around a theme of urgency - 'Maxellerate, it's now or never' - carried through a full day of speaker sessions and a leadership panel for its own delegation. A line that bold needed a closing moment to match it, not another slide repeating it back to the room.",
+    solution:
+      "We staged the full day end to end - the branded set, the podium sessions and the panel - and closed the conference by moving the delegation outdoors and arranging them, from directly overhead, into the shape of the company's own wing mark.",
+    impact:
+      "Maxellerate closed on an image that actually earned its theme - the whole delegation shaped, from the air, into the company's own mark, rather than a tagline left on a screen after the room had already emptied.",
+  },
+  {
+    slug: "mongodb-developer-day",
+    title: "MongoDB Developer Day",
+    client: "MongoDB",
+    pillar: "corporate",
+    /*
+     * Real photographs now (public/mongodb-event-images/) - no legacy
+     * slide behind this entry either, same as Maxellerate. The deck's
+     * Curatorial Scope named "Vector Search for AI" as one of the taught
+     * topics; DSC04233 below shows that exact module running as a timed
+     * "Skill Badge Time: Vector Search Fundamentals" exercise with its own
+     * QR code and countdown clock, which is a more specific and more
+     * interesting claim than the deck made on its own, so the lead and
+     * headline are built around it rather than an establishing stage shot.
+     * The venue's own Wi-Fi slide (DSC03988, "@Hyatt_wifi") and the skill
+     * badge's link ("mdb.link/pune-25", "#MDBDayPune") also confirm this
+     * particular set is the Pune stop of the deck's "multi-city
+     * replication strategy" - the multi-city claim itself is the deck's,
+     * not something one city's photos could confirm or deny on their own.
+     */
+    image: "/mongodb-event-images/DSC04233.jpg",
+    alt: "A MongoDB Developer Day presenter walks through a 'Skill Badge Time: Vector Search Fundamentals' exercise, a twenty-minute countdown timer and a QR code to claim the badge on the screen behind her",
+    gallery: [
+      {
+        src: "/mongodb-event-images/DSC04041.jpg",
+        alt: "The MongoDB Developer Day registration desk, three hosts posed behind the branded green backdrop, a 'Scan, Share, Win: MongoDB Social Champ' gamification screen running beside them",
+      },
+      {
+        src: "/mongodb-event-images/DSC03930.jpg",
+        alt: "Attendees checking in at the MongoDB Developer Day registration desk, three hosts working through the queue",
+      },
+      {
+        src: "/mongodb-event-images/DSC03943.jpg",
+        alt: "The empty MongoDB Developer Day stage before the show, the MongoDB leaf mark lit on the main screen and a round table set with water bottles and notepads in the foreground",
+      },
+      {
+        src: "/mongodb-event-images/DSC03979.jpg",
+        alt: "Rows of attendees seated at round tables with laptops open, filling the room during a Developer Day session",
+      },
+      {
+        src: "/mongodb-event-images/DSC03988.jpg",
+        alt: "Two speakers on the Developer Day stage beside a screen showing the venue's Wi-Fi login details for '@Hyatt_wifi'",
+      },
+      {
+        src: "/mongodb-event-images/DSC04028.jpg",
+        alt: "A presenter mid-session at the Developer Day podium, laptop open in front of him",
+      },
+      {
+        src: "/mongodb-event-images/DSC04145.jpg",
+        alt: "A presenter addresses the room from beside the Developer Day podium, a technical slide partly visible on the screen behind her",
+      },
+    ],
+    note: "Multi-city production and technical infrastructure for MongoDB's 'Developer Day', a hands-on workshop programme on modern data modeling, Vector Search and scalable application architecture - this stop at the Hyatt, Pune.",
+    headline: "A Developer Day Measured Out In Timed Skill Badges",
+    problem:
+      "MongoDB's 'Developer Day' was built around hands-on workshops - modern data modeling, Vector Search for AI, scalable application architecture - taught through timed, practical exercises rather than lectures, each closed out with its own shareable skill badge. Every attendee needed a live coding environment that worked inside the clock running on screen, and the programme ran simultaneously across several cities rather than in sequence.",
+    solution:
+      "We built the technical infrastructure behind the hands-on sessions - the high-bandwidth networking each timed exercise needed to run inside its own clock - alongside registration and production for a full room of laptops, delivered to the same standard in every city on the schedule, this stop at the Hyatt in Pune.",
+    impact:
+      "Developer Day ran as a genuinely hands-on programme at every stop, this one included - the exercises, the timers and the registration line holding up under a packed room of laptops rather than becoming the bottleneck.",
+  },
+  {
+    slug: "campa-christmas-fair",
+    title: "Campa Christmas Fair Activation",
+    client: "Campa",
+    pillar: "activation",
+    /*
+     * Real photographs now (public/campa-event-images/) - arrived in a
+     * folder named "royal-enfield-event-images" with a message calling
+     * them Royal Enfield's. Every one of the six frames is unmistakably
+     * Campa instead - "Campa Sure" and "Campa Cola" branded booths, a
+     * Christmas Fair backdrop, a ferris wheel and "District by Zomato"
+     * signage matching this entry's own "Spectrum Spotlight" deck slide
+     * (Christmas Fair, Jio Garden, Mumbai) exactly, and nothing Royal
+     * Enfield anywhere in frame. Folder and files renamed to match what is
+     * actually in them before being wired in here; Royal Enfield itself
+     * still has no real photographs and stays undrafted in work.ts.
+     *
+     * The deck's Curatorial Scope described one repeated "branded hydration
+     * booth" design; the photographs show two distinct formats instead -
+     * teal "Campa Sure" stalls and purple "Campa Cola" stalls - built and
+     * staffed as their own booths rather than one design reused. The lead
+     * below is the night shot of the Campa Sure counter actually serving
+     * guests, not an empty booth shot, because it is the only frame in the
+     * set that shows the "high engagement" the deck's own Curatorial Scope
+     * claimed rather than just asserting it.
+     */
+    image: "/campa-event-images/campa-sure-booth-night.jpeg",
+    alt: "The Campa Sure hydration booth lit up at night, three guests served at the counter, a Christmas garland strung along the roofline and a yellow inflatable slide behind it",
+    gallery: [
+      {
+        src: "/campa-event-images/campa-team-christmas-tree.jpeg",
+        alt: "The full Campa crew lined up in front of the fair's giant decorated Christmas tree, city high-rises visible behind them",
+      },
+      {
+        src: "/campa-event-images/campa-sure-booth-day.jpeg",
+        alt: "The Campa Sure booth by day, two staff behind the counter, a ferris wheel and the fair's 'District by Zomato' signage visible behind them",
+      },
+      {
+        src: "/campa-event-images/campa-cola-booth-staff-day.jpeg",
+        alt: "Three staff posed behind the Campa Cola booth, its purple branded canopy strung with tinsel and ornaments",
+      },
+      {
+        src: "/campa-event-images/campa-cola-booth-solo-day.jpeg",
+        alt: "A single staff member at the Campa Cola booth, a red-and-white striped food cart and the fair's scaffolding signage behind him",
+      },
+      {
+        src: "/campa-event-images/campa-cola-booth-crowd-night.jpeg",
+        alt: "Guests gathered at the Campa Cola booth at night, its purple canopy lit up with festive lighting",
+      },
+    ],
+    note: "Booth network design, construction and hydration logistics for Campa's Christmas Fair activation at Jio Garden, Mumbai, spanning its Campa Cola and Campa Sure formats.",
+    headline: "Campa Cola And Campa Sure, Built To Look Like One Booth Network",
+    problem:
+      "Campa needed a network of hydration booths spread out across a sprawling Christmas Fair site, split across its own Campa Cola and Campa Sure formats rather than one repeated design, each booth built and branded consistently regardless of where on the fairground it sat, backed by a water supply that could keep every booth stocked without a single one running dry across the length of the fair.",
+    solution:
+      "We designed and built both booth formats end to end - construction, branding and placement across the fairground for the Campa Cola and Campa Sure stalls alike - and ran the water supply chain behind them, replenishing every booth in real time rather than waiting for one to run empty before restocking it.",
+    impact:
+      "Campa's booths - Cola and Sure alike - stayed visible, consistently branded and fully stocked across the whole fairground for the length of the Christmas Fair, with the water supply chain running in real time behind every one of them.",
+  },
+  {
+    slug: "cloudflare-ai-security-roadshow",
+    title: "Cloudflare AI Security Roadshow",
+    client: "Cloudflare",
+    pillar: "corporate",
+    /*
+     * Real photographs now (public/cloudflare-event-images/), correctly
+     * labelled this time. The deck's own working title was a guess
+     * ("Cloudflare AI Security"); the branding on every banner and screen
+     * here confirms the real name is "AI Security Roadshow", and every
+     * banner reads "Bengaluru" specifically - this gallery is one stop on
+     * a multi-city rollout, not the whole of it, and it only speaks for
+     * the city it was actually photographed in.
+     *
+     * DSC08164 (the lead) is a presenter walking through a four-part
+     * "protect AI apps / build securely / govern agentic access / protect
+     * workforce GenAI" framework, naming ChatGPT and Claude by name on
+     * screen - a direct, more specific confirmation of the workforce-
+     * GenAI-risk framing the deck itself only gestured at. The Security
+     * Leadership Panel (DSC08193, DSC08221) is the detail the deck never
+     * had at all: Cloudflare shared the closing stage with named security
+     * and engineering leadership from two of its own customers, Credit
+     * Saison India and FourKites, rather than closing on a Cloudflare-only
+     * note. One slide (DSC08130) carries a dense wall of breach and
+     * AI-security statistics; described generically in its alt rather than
+     * transcribed, the same treatment MongoDB's cropped "CRUD" slide got -
+     * these are Cloudflare's own third-party marketing statistics, not a
+     * claim this file is in a position to stand behind digit for digit.
+     */
+    image: "/cloudflare-event-images/DSC08164.jpg",
+    alt: "A presenter at the AI Security Roadshow Bengaluru stage walks through four ways to secure AI - protecting AI-powered apps, building securely with AI, governing agentic AI access, and protecting workforce use of GenAI tools like ChatGPT and Claude - each labelled on the screen behind him",
+    gallery: [
+      {
+        src: "/cloudflare-event-images/DSC08115.jpg",
+        alt: "The AI Security Roadshow Bengaluru stage as a speaker introduces the day's agenda, delegates seated in the foreground with the Cloudflare and 'AI Security Roadshow, Bengaluru' branding either side of the screen",
+      },
+      {
+        src: "/cloudflare-event-images/DSC08131.jpg",
+        alt: "A speaker at the Bengaluru stage presents Cloudflare's framing of AI security as a C-level concern, split across the CISO's risk management, the CIO's adoption push and the CTO's build-and-integrate work",
+      },
+      {
+        src: "/cloudflare-event-images/DSC08130.jpg",
+        alt: "A speaker addresses the room in front of a data-heavy slide of breach and AI-security statistics, titled 'Dwindling threat response capability'",
+      },
+      {
+        src: "/cloudflare-event-images/DSC08120.jpg",
+        alt: "The full seated room at the AI Security Roadshow Bengaluru, viewed from the side, round tables dressed in white and gold facing the stage screen",
+      },
+      {
+        src: "/cloudflare-event-images/DSC08193.jpg",
+        alt: "The Security Leadership Panel introduction slide, three empty chairs set below it, naming panellists from Cloudflare, Credit Saison India and FourKites ahead of the discussion",
+      },
+      {
+        src: "/cloudflare-event-images/DSC08221.jpg",
+        alt: "The Security Leadership Panel in conversation, one panellist mid-answer with a microphone in hand, the other two listening",
+      },
+      {
+        src: "/cloudflare-event-images/DSC08295.jpg",
+        alt: "Guests at the registration table collecting Cloudflare-branded gift bags, a 'Confidently secure GenAI use' banner and a QR code to book a one-on-one session behind them",
+      },
+    ],
+    note: "Event production and guest experience for Cloudflare's 'AI Security Roadshow', its AI-adoption security briefing series - this stop in Bengaluru.",
+    headline: "An AI Security Briefing That Ended With Customers On Its Own Panel",
+    problem:
+      "Cloudflare needed the same AI-security briefing to land with technical credibility city after city - covering the CISO's risk management, the CIO's adoption push and the CTO's build-and-integrate work around AI and agentic workloads - without the message reading as a one-way pitch delivered by Cloudflare alone.",
+    solution:
+      "We produced the briefing end to end at this stop in Bengaluru - the branded stage and content session on AI-agent risk and workforce GenAI use, a guest registration and gifting experience built around booking a follow-up, and a closing panel that put Cloudflare's speakers alongside security and engineering leadership from its customers, Credit Saison India and FourKites.",
+    impact:
+      "The briefing closed with customers, not just Cloudflare, making the security case from the same stage - Credit Saison India and FourKites' own leadership on the panel - carrying the message further than a vendor pitch could alone.",
+  },
+  {
+    slug: "caslay-sustainable-brand",
+    title: "Caslay",
+    client: "Caslay",
+    pillar: "corporate",
+    /*
+     * Real photographs now (public/caslay-event-images/) - arrived as
+     * "WhatsApp Image" files with a literal space and, on six of the
+     * seven, a " (1)"/" (2)" duplicate-download suffix; renamed to plain
+     * descriptive names before being wired in here, same reasoning as
+     * Montra Electric's source files.
+     *
+     * The booth architecture matches the deck's own description almost
+     * exactly - tree-silhouette structure, green palette, "Sustainable /
+     * Responsible / Everyday" signage - which is corroboration, not new
+     * information. What the deck's Curatorial Scope never mentioned is
+     * visible in every interior shot: "India's Most Sustainable Brand!" is
+     * credited "Powered by ECOJAY", a named partner alongside the claim
+     * rather than the claim standing alone. The lead is the crowded shot,
+     * not an empty booth shot - it is the only frame that shows the stand
+     * actually working the way a trade-show booth is meant to.
+     */
+    image: "/caslay-event-images/caslay-booth-crowd-day.jpeg",
+    alt: "The Caslay exhibition booth crowded with visitors, staff in purple polo shirts assisting them at the counter, the 'India's Most Sustainable Brand!, powered by ECOJAY' badge and the tree-silhouette wall lit up behind them",
+    gallery: [
+      {
+        src: "/caslay-event-images/caslay-booth-exterior-empty.jpeg",
+        alt: "The Caslay booth's tree-silhouette exterior before the doors open, the 'Sustainable, Responsible, Everyday' badge lit above the empty display wall, a neighbouring 'JAYPEE' stand visible alongside",
+      },
+      {
+        src: "/caslay-event-images/caslay-booth-exterior-corner.jpeg",
+        alt: "A wider view of the Caslay booth's corner position on the show floor, its lit signage visible on both open sides, the aisle and neighbouring stands running past it",
+      },
+      {
+        src: "/caslay-event-images/caslay-interior-ecojay-empty.jpeg",
+        alt: "The empty Caslay booth interior straight on, 'India's Most Sustainable Brand!, powered by ECOJAY' lit beside the circular Caslay logo, retail displays and bar seating set up ahead of the doors opening",
+      },
+      {
+        src: "/caslay-event-images/caslay-retail-wall-shoppers.jpeg",
+        alt: "Visitors browsing the Caslay retail wall, rows of colour-blocked polo shirts and t-shirts on hangers beneath the 'Sustainable, Responsible, Everyday' lettering",
+      },
+      {
+        src: "/caslay-event-images/caslay-booth-front-angle.jpeg",
+        alt: "The Caslay booth's front corner, its lit signage above the counter, visitors passing the neighbouring 'OFFIKRAFT' stand on the show floor",
+      },
+      {
+        src: "/caslay-event-images/caslay-booth-front-wide.jpeg",
+        alt: "A frontal view of the Caslay booth, the counter and branded signage lit beneath the tree-silhouette canopy, a visitor passing on the show floor",
+      },
+    ],
+    note: "Booth architecture and retail display design for Caslay's presence at a major textile and garment exhibition, built around its 'India's Most Sustainable Brand' positioning and its ECOJAY partnership.",
+    headline: "A Sustainability Claim Built Into The Architecture, Not Just The Signage",
+    problem:
+      "Caslay needed its trade booth to argue 'India's Most Sustainable Brand' on sight, inside a crowded exhibition hall full of competing apparel and accessory stands, backed by a named sustainability partner, ECOJAY, credited on the booth itself rather than the claim standing alone.",
+    solution:
+      "We designed and built the booth's nature-inspired architecture end to end - tree-silhouette structural elements, a green palette carried through the apparel and accessory displays, and backlit branding for the sustainability claim and the ECOJAY credit alike - installed as precision modular fit-out sized for a high-traffic hall.",
+    impact:
+      "Caslay's stand carried its sustainability positioning through the architecture itself, not just the signage, and stayed visible, legible and busy against a hall full of competing stands.",
+  },
+  {
+    slug: "royal-enfield-roadshow",
+    title: "Royal Enfield Roadshow",
+    client: "Royal Enfield",
+    pillar: "activation",
+    /*
+     * WRITTEN AGAINST THE PHOTOGRAPHS, AND THEY OVERRULED AN EARLIER DRAFT.
+     * A version of this entry was drafted before any photography existed,
+     * describing a touring campaign across North and West India with an
+     * India Auto Fair pavilion, filed under "corporate". It was deliberately
+     * never committed, on the rule this file keeps learning the hard way -
+     * see India Drives above, where a deck's Delhi/VIP narrative had to be
+     * dropped once the real frames contradicted it. Nothing in these ten
+     * photographs shows an auto-fair pavilion or names a region, so neither
+     * claim survives. The pillar moved to "activation" for the same reason:
+     * malls, office forecourts, public parks and district fairs are brand
+     * activation, whatever the draft assumed.
+     *
+     * WHAT THE PHOTOGRAPHS ACTUALLY AGREE ON is better than the draft was.
+     * The SAME modular kit - grey levelling deck, navy plinth carrying the
+     * logo, swappable backdrop panels - is identifiable in frame after frame
+     * across wildly different grounds: mall marble, an office-park forecourt,
+     * a corporate campus lobby, bare fairground earth, a roadside park. That
+     * is the case study, and it is visible rather than asserted.
+     *
+     * TWO SEPARATE YEARS, AT LEAST. One backdrop reads "122 Years Of
+     * Motorcycling" and another "120", and the model campaigns differ across
+     * frames (Scram, Bullet, Hunter). That is what licenses "across seasons
+     * and across model launches" in the impact line - it is counted off the
+     * backdrops, not assumed.
+     *
+     * THE LEAD IS THE MALL FRAME, NOT THE TYRE. The tyre set piece is far
+     * and away the most striking image here, and it is second in the gallery
+     * for that reason. It is not the lead because it is one indoor launch:
+     * leading on it would sell a touring programme as a single ballroom
+     * night. The mall frame shows the travelling kit in a real venue with a
+     * host working it, which is what the copy argues. Same call Caslay's
+     * crowded-booth lead makes over its prettier empty-booth frames.
+     *
+     * ONE SUPPLIED FILE IS NOT ROYAL ENFIELD and is deliberately not wired
+     * in: "WhatsApp Image 2026-08-08 at 22.27.43 (3).jpeg", still in this
+     * folder under its original name so it stays identifiable. It shows a
+     * bamboo arch, pampas-grass arrangements and banquet seating on a
+     * waterfront lawn - a wedding or social set, misfiled into this batch.
+     * It may well belong to Weddings & Social; nothing here establishes
+     * that, so it has not been moved there on a guess.
+     *
+     * The other ten arrived as "WhatsApp Image" files with literal spaces
+     * and " (1)"/" (2)" duplicate-download suffixes, renamed to plain
+     * descriptive names before being wired in - same reasoning as Caslay's
+     * and Montra Electric's source files.
+     */
+    image: "/royal-enfield-event-images/royal-enfield-mall-atrium-host.jpeg",
+    alt: "A Royal Enfield display in a shopping mall atrium, three motorcycles lined up on a grey deck behind a navy plinth carrying the brand's logo, a host in a black suit standing at the plinth, 'A Ton Of Fun' and Scram banners and a helmeted mannequin in riding gear behind",
+    gallery: [
+      {
+        src: "/royal-enfield-event-images/royal-enfield-hunter-tyre-ring.jpeg",
+        alt: "A black Royal Enfield Hunter 350 parked inside a giant motorcycle tyre built as a set piece, 'A Shot Of Motorcycling' lettered around its tread, a neon Hunter 350 speedometer graphic lit on the backdrop behind it",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-hunter-ring-wide.jpeg",
+        alt: "The same tyre set piece seen whole and empty in the ballroom, the '#VibeHunter' backdrop wall lit behind it and a 'click, post, spin' instruction card on an easel to one side",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-hunter-ring-angle.jpeg",
+        alt: "The tyre set piece from an angle, showing its full depth and the tread moulded into the sidewall, lighting battens curving overhead towards the illuminated Hunter 350 backdrop",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-merchandise-stand.jpeg",
+        alt: "The Royal Enfield merchandise stand at the same indoor event, helmets and mugs on a timber display wall under the brand's lettering, t-shirts and jackets on rails either side, a mannequin in a Hunter tee and a branded reception desk in front",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-mall-evening.jpeg",
+        alt: "The display working in a mall atrium in the evening, motorcycles on the deck beside a lit tower screen, a mannequin in helmet and riding jacket standing among them, a car manufacturer's display sharing the same floor",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-office-park.jpeg",
+        alt: "The stand set up on the forecourt of an office park, a heritage panel and branded desk on the deck with staff seated at it, motorcycles lined up on the tarmac alongside and the building's tenant directory board behind",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-campus-heritage-wall.jpeg",
+        alt: "Office workers gathered at the heritage timeline wall on a corporate campus forecourt, a motorcycle parked in front of the panel and a host standing by the branded plinth",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-fairground.jpeg",
+        alt: "The same deck built on bare ground at a district fair, motorcycles and model banners standing on it, visitors stepping up to look, the fair's pink and white fencing running behind",
+      },
+      {
+        src: "/royal-enfield-event-images/royal-enfield-park-plinth.jpeg",
+        alt: "The display built in a roadside park before opening, an empty plinth on the deck in front of a mountain backdrop reading '122 Years Of Motorcycling', benches and trees around it",
+      },
+    ],
+    note: "Touring display design, fabrication and staffing for Royal Enfield - a modular stand taken to malls, office parks, public grounds and district fairs, plus an indoor launch set and merchandise stand for the Hunter.",
+    headline: "The Same Stand, On A Marble Floor And On Bare Earth",
+    /*
+     * KEEP THIS AT ROUGHLY THE LENGTH OF ITS NEIGHBOURS. The carousel
+     * stacks every study in one grid cell, so all thirteen cards are as
+     * tall as the LONGEST copy among them - one overlong entry silently
+     * pads out the other twelve and pushes the whole section past the fold.
+     * The first cut of this entry did exactly that: it needed 902px where
+     * the next longest study needed 718px, and it alone set the height of
+     * the section. Trimmed to match. If a future entry wants more room,
+     * the cost is paid by every other card on the page.
+     */
+    problem:
+      "A motorcycle gets bought after somebody has swung a leg over it, and the riders worth reaching rarely walk into a dealership to do that. So the display goes to them - a mall atrium at the weekend, an office park forecourt, a district fair on a dust field - and those places share almost nothing.",
+    solution:
+      "So the stand was built to travel rather than to be rebuilt each time: a levelling deck that sits flat on stone, tarmac or dirt, a plinth carrying the mark, and backdrop panels that swap for whatever the campaign is that month. It goes up in a morning and comes down the same night. Indoors it steps up into a purpose-built set - a tyre tall enough to walk through, lit from within, with the new machine framed inside it.",
+    impact:
+      "The same deck and plinth turn up in these photographs on mall marble, on a corporate forecourt, in a public park and on a fairground, across seasons and model launches - a brand whose whole story is riding to where the road runs out, given a display that could follow it there.",
+  },
+  {
+    slug: "cloudflare-immerse",
+    title: "Cloudflare Immerse",
+    client: "Cloudflare",
+    pillar: "corporate",
+    /*
+     * THE PHOTOGRAPHS MOVED THIS ENTRY OFF ITS OWN DRAFT, which is the third
+     * time this file has recorded that happening and the reason the rule
+     * exists. The copy was written from the client's write-up before any
+     * frames existed, and it led on the audience split - a developer track
+     * and a decision-maker track, each with a session of its own. Nothing in
+     * eighteen photographs corroborates two separate sessions: there is one
+     * ballroom, one stage and one audience, in every frame. The split may
+     * well be true and sequential in the same hall, but a headline is not
+     * the place to assert what the evidence does not show, so it moved to
+     * what the evidence does show, overwhelmingly.
+     *
+     * WHAT IT SHOWS IS AN UNBROKEN BRANDED ROUTE, and it is visible step by
+     * step: a Cloudflare welcome standee standing beside the hotel's baggage
+     * scanner at the porte-cochere, a digital totem in the corridor naming
+     * the hall, a lit registration counter with the queue on belt barriers,
+     * the hall itself, and a photo-op wall on the way out. That is the
+     * client's "coordinating multiple event touchpoints" made literal, and
+     * it is the strongest thing here.
+     *
+     * THE VENUE IS NAMED BECAUSE THE PHOTOGRAPH NAMES IT. The wayfinding
+     * totem carries ITC Hotel branding on its plinth and "AT MYSORE HALL" on
+     * its screen. Contrast India Drives above, where the deck's Ashoka Hotel
+     * claim was dropped precisely because no photograph supported it.
+     *
+     * THE CLIENT'S ATTENDANCE FIGURES AND THE DATE ARE ABSENT, deliberately
+     * and per the rule on WorkItem - see the note that used to sit below
+     * this array. Naming the two communities carries the same point.
+     *
+     * SPEAKERS ARE NOT NAMED IN THE ALT TEXT even though the screens name
+     * them. They are Cloudflare staff rather than public figures, the names
+     * add nothing a reader of this page needs, and every name in an alt is a
+     * fact that can go stale. India Pod Day names Javed Akhtar because the
+     * marquee booking IS the story there; here it is not.
+     *
+     * SIX OF THE EIGHTEEN SUPPLIED FRAMES ARE NOT WIRED IN and keep their
+     * original camera filenames in the same folder, so a descriptive name
+     * means "in use": two more empty-hall angles, a second registration
+     * frame, a close panel crop, and two further slide shots that the
+     * shadow-AI frame below already covers better.
+     *
+     * SOURCE FILES ARE FULL-RESOLUTION CAMERA JPEGs - the folder is about
+     * forty-four megabytes, one frame alone near ten. They are wired in
+     * unmodified rather than re-encoded on our own initiative; the media
+     * column is a few hundred pixels wide, so these want downscaling before
+     * this ships anywhere on a metered connection.
+     */
+    image: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-full-hall.jpg",
+    alt: "The Cloudflare Immerse hall in Bengaluru at capacity, every round table taken, a speaker on stage introducing the Cloudflare speaker line-up on the wide LED behind him under a full lighting rig",
+    gallery: [
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-entrance-welcome.jpg",
+        alt: "A Cloudflare-branded 'Welcome' standee standing at the hotel entrance beside the baggage scanner and walk-through metal detector, on wet paving under the porte-cochere",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-wayfinding-totem.jpg",
+        alt: "A digital wayfinding totem in the hotel corridor showing 'Cloudflare Immerse, Bengaluru, at Mysore Hall' over a line drawing of the city skyline, the ITC Hotel plinth beneath it",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-registration-queue.jpg",
+        alt: "Delegates queueing at the lit Cloudflare registration counter in the hotel foyer, the queue held on belt barriers, marble floor and chandeliers around them",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-hall-set.jpg",
+        alt: "The hall set and empty before doors, round tables dressed in white with water and table cards, the wide curved LED lit with the Cloudflare Immerse Bengaluru title and content standees either side of the stage",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-stage-letters.jpg",
+        alt: "The stage from a low angle, three-dimensional CLOUDFLARE lettering and the cloud mark standing along the stage edge in front of the illuminated Immerse Bengaluru screen",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-session-open.jpg",
+        alt: "A speaker at the branded lectern opening a session, the wide LED behind him carrying the Immerse Bengaluru title and the Cloudflare logo, delegates seated at round tables in the foreground",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-shadow-ai-demo.jpg",
+        alt: "A speaker walking the room through a live product screen titled 'Step One: Gaining Visibility to Assess Risk', listing AI applications found in use and marked unapproved, the room watching in silhouette",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-delegates.jpg",
+        alt: "The room with the house lights up, delegates in lanyards at round tables with laptops open and notes out, listening",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-fireside-chat.jpg",
+        alt: "The fireside chat under way, four panellists in armchairs on stage with one mid-answer, the centre screen switched to a rain-on-glass image and Immerse Bengaluru panels flanking it, a full room watching",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-closing-remarks.jpg",
+        alt: "Closing remarks from the stage, the speaker with a handheld microphone beside a screen reading 'Closing Remarks' with his portrait and title alongside",
+      },
+      {
+        src: "/cloudflare-immerse-new-event-images/comp-imgs/cloudflare-immerse-photo-wall.jpg",
+        alt: "Delegates posing at the photo-op wall, three-dimensional CLOUDFLARE lettering above an illustrated panel reading 'path to safe AI adoption', a framed hotel painting on the wall behind",
+      },
+    ],
+    note: "End-to-end production for 'Cloudflare Immerse' at an ITC hotel in Bengaluru - venue sourcing, branded arrival, registration and wayfinding, stage, AV and lighting for the conference and the fireside chat, delegate collateral and swag, and a photo-op wall.",
+    headline: "Branded From The Security Scanner To The Photo Wall",
+    problem:
+      "Cloudflare Immerse had to bring developers and decision-makers together in Bengaluru for a day of AI-security content, and a day like that is judged before anyone reaches the stage. A hotel ballroom is a hotel ballroom until somebody makes it yours, and the impression is set at the door and in the queue.",
+    solution:
+      "We sourced and finalised the venue, then branded the route through it: a welcome standee at the entrance screening, digital wayfinding naming the hall, a lit registration counter with the queue on barriers. Inside we built the stage and its wide LED, ran the lighting and AV behind the conference and the fireside chat, and put swag on the tables and a photo-op wall on the way out.",
+    impact:
+      "A delegate met the brand at the hotel door and did not leave it until the photo wall - wayfinding, registration, stage, fireside chat and swag all reading as the same event rather than a room hired for the day.",
   },
 ];
 
 /*
- * TEMPORARY - REMOVE BEFORE LAUNCH, along with the call in
- * CaseStudyCarousel. Every `gallery` above is empty because there is
- * exactly one real photograph of each event, so the nested photo carousel
- * has nothing to page through and renders no dots at all.
+ * THE DEMO_FILL MECHANISM THAT USED TO LIVE HERE IS GONE, and its own
+ * comment is what said to delete it: "once it arrives, fill in `gallery`
+ * above, then delete this flag and the borrowing branch in galleryFor
+ * below." wedding-social was the last entry with an empty `gallery`, and
+ * it has a real one now, so every branch of that code was unreachable.
  *
- * With this on, each case study borrows two frames from OTHER events so
- * the sub-carousel can be seen and judged. They are real photographs of
- * real Assertive work, but they are NOT photographs of the event whose
- * case study they appear in - which is a caption error of exactly the kind
- * already logged against the legacy site at the top of this file. It must
- * not ship.
+ * What it did, for anyone reading this in a diff: when an entry had no
+ * gallery of its own, its nested photo strip had nothing to page through,
+ * so the flag lent it frames from ANOTHER gallery-less entry - a real
+ * photograph of a different event, carrying that event's alt text. It
+ * existed so the sub-carousel could be seen and judged before the real
+ * photography arrived, and it was flagged "must not ship" throughout,
+ * for the obvious reason: it is the same caption-mismatch failure this
+ * file's top comment logs against the legacy site, only self-inflicted.
  *
- * The fix is not code: it is asking the client for the real galleries.
- * Once they arrive, fill in `gallery` above and set this to false.
+ * Do not reintroduce it for the next entry that arrives without photos.
+ * A one-photo strip already renders correctly - CaseStudyCarousel guards
+ * both its dots and its auto-advance on `photos.length > 1` - so an entry
+ * with only a lead frame is an honest render, not a broken one.
  */
-export const DEMO_FILL = true;
-
 export function galleryFor(item: WorkItem): Photo[] {
-  const own: Photo[] = [{ src: item.image, alt: item.alt }, ...item.gallery];
-  if (!DEMO_FILL || own.length > 1) return own;
-
-  /*
-   * Matched on SLUG, not by identity. This runs inside a client component
-   * whose items were handed over the server boundary, so they arrive as
-   * fresh objects deserialized from the RSC payload - never the same
-   * references this module's own WORK array holds. indexOf found nothing,
-   * returned -1, and -1 % 4 is -1 in JS rather than 3, so the fill picked
-   * an undefined entry and took the prerender down with it.
-   */
-  const others = WORK.filter((w) => w.slug !== item.slug);
-  if (!others.length) return own;
-  const at = Math.max(0, WORK.findIndex((w) => w.slug === item.slug));
-  const borrowed = [others[at % others.length], others[(at + 2) % others.length]];
-  return [...own, ...borrowed.map((w) => ({ src: w.image, alt: w.alt }))];
+  return [{ src: item.image, alt: item.alt }, ...item.gallery];
 }

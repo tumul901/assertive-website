@@ -6,25 +6,63 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion, AnimatePresence } from "motion/react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MegaMenu } from "@/components/layout/MegaMenu";
 import { PILLARS } from "@/lib/data/pillars";
-import { SERVICES } from "@/lib/data/services";
 import { cn } from "@/lib/utils";
-import { useDropdown } from "@/lib/use-dropdown";
 
-const CLIENTS_LINKS = [
-  { label: "Client Information", href: "/clients" },
-  { label: "Vendor Registration", href: "/vendor-registration" },
-];
-const CONTACT_LINKS = [
-  { label: "Contact Information", href: "/contact" },
-  { label: "Client Query", href: "/client-query" },
-];
+/*
+ * CLIENTS IS AN ANCHOR, NOT A SECTION. It used to be a dropdown over
+ * "Client Information" (/clients) and "Vendor Registration"
+ * (/vendor-registration). Neither route was ever built, so both arms of
+ * the only two-item menu on the bar led to a 404 - the menu existed to
+ * offer a choice between two dead ends.
+ *
+ * The honest answer to "who are your clients" is already on the page: the
+ * Trusted by bar, sitting on the homepage with the real logos in it. So
+ * the nav item points straight at it.
+ *
+ * ABSOLUTE, not a bare "#trusted-by", because this header renders on the
+ * discipline pages too - a bare fragment there would look for the bar in a
+ * page that does not have one and do nothing at all. The id lives on the
+ * card in TrustBar.tsx; renaming it there breaks this and the footer.
+ */
+const CLIENTS_HREF = "/#trusted-by";
+
+/*
+ * About Us is an anchor too, for the same reason Clients is: there was no
+ * /about page behind it and never had been, so the item every visitor is
+ * most likely to click first was a 404. The About section on the homepage
+ * is the whole of what such a page would have said - the client's own copy,
+ * verbatim, in three parallel statements - so the nav points at it.
+ *
+ * Absolute, not a bare "#about", so it also works from the discipline
+ * pages. The id lives on the portal wrapper in AboutPortal.tsx.
+ */
+const ABOUT_HREF = "/#about";
+
+/*
+ * ONE DOOR FOR GETTING IN TOUCH, and it is this one.
+ *
+ * The bar used to offer three, all meaning the same thing: a "Contact"
+ * dropdown over "Contact Information" (/contact) and "Client Query"
+ * (/client-query), plus a standing "Client Query" button in the corner.
+ * Three affordances, one intention - and all three routes were unbuilt, so
+ * every one of them 404d.
+ *
+ * There is no separate contact page to write, either. The two ways to
+ * reach this agency are the enquiry form at the foot of the homepage and
+ * the WhatsApp widget, which is on every page already. So the nav points
+ * at the form and the widget speaks for itself.
+ *
+ * Same absolute-path reasoning as CLIENTS_HREF above: a bare "#enquiry"
+ * would find nothing on the discipline pages. The id and its scroll-mt
+ * live on the section in Enquiry.tsx.
+ */
+const ENQUIRY_HREF = "/#enquiry";
 
 function NavLink({ href, children }: { href: string; children: ReactNode }) {
   const pathname = usePathname();
@@ -45,39 +83,14 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
   );
 }
 
-function SimpleDropdown({ label, links }: { label: string; links: { label: string; href: string }[] }) {
-  const { open, rootProps, triggerProps, closeNow } = useDropdown();
-  return (
-    <div className="relative" {...rootProps}>
-      <button
-        type="button"
-        className="text-base inline-flex items-center gap-1 font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
-        {...triggerProps}
-      >
-        {label}
-        <ChevronDown
-          size={16}
-          aria-hidden="true"
-          className={cn("transition-transform duration-[var(--dur-fast)]", open && "rotate-180")}
-        />
-      </button>
-      {open && (
-        <div className="absolute left-1/2 top-full z-50 mt-3 w-56 -translate-x-1/2 rounded-lg border border-hairline bg-surface-raised p-3 shadow-bar">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={closeNow}
-              className="text-body block rounded-sm px-3 py-2 text-ink hover:bg-surface"
-            >
-              {l.label}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+/*
+ * SimpleDropdown lived here - a label, a chevron and a small panel of
+ * links, shared by the Clients and Contact menus. Both of those are single
+ * anchors now (CLIENTS_HREF, ENQUIRY_HREF), so nothing on this bar opens a
+ * panel except MegaMenu, which has its own. Deleted rather than left for
+ * later: it took useDropdown and ChevronDown with it, and a spare dropdown
+ * sitting in the file is an invitation to grow the nav back.
+ */
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -169,7 +182,26 @@ export function Header() {
       )}
     >
       <Container className="flex h-full items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-corporate-ink">
+        {/*
+          lg:flex-1 HERE AND ON THE RIGHT-HAND SLOT IS WHAT CENTRES THE NAV,
+          and it is a fix rather than a flourish.
+
+          justify-between distributes equal GAPS, which only centres the
+          middle item when the items flanking it are the same width. They
+          are nowhere near: measured at 1280, the logo lockup is 219px and
+          the theme toggle beside it is 44px, so the bar was pushing the
+          nav (219 - 44) / 2 = 87px to the right of the page centre. It
+          measured 80px off, which is that arithmetic.
+
+          Two flex-1 flanks share the leftover space equally instead, so
+          the nav lands on the real centre line. Both keep their intrinsic
+          min-width, so nothing here can squash the wordmark - and there is
+          room for it to work: at the 1024 lg breakpoint each flank gets
+          251px against the logo's 219px, and the margin only grows from
+          there. Below lg the nav is display:none, so flex-1 is scoped to
+          lg to leave the phone layout exactly as it was.
+        */}
+        <Link href="/" className="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-corporate-ink lg:flex-1">
           <Image src="/logo-mark.png" alt="" width={45} height={44} className="h-9 w-auto lg:h-10" priority />
           <span className="flex flex-col leading-none">
             <span className="text-lg font-bold text-ink lg:text-xl">Assertive</span>
@@ -179,20 +211,23 @@ export function Header() {
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           <NavLink href="/">Home</NavLink>
-          <NavLink href="/about">About Us</NavLink>
+          <NavLink href={ABOUT_HREF}>About Us</NavLink>
           <MegaMenu />
-          <SimpleDropdown label="Clients" links={CLIENTS_LINKS} />
-          <SimpleDropdown label="Contact" links={CONTACT_LINKS} />
+          {/* No chevron and no underline, both correct: there is nothing
+              to open, and NavLink's active rule compares against
+              usePathname(), which excludes the fragment - an in-page jump
+              is not a "current page". */}
+          <NavLink href={CLIENTS_HREF}>Clients</NavLink>
+          {/* Takes Contact's slot, and it is the ONLY way in from this bar
+              now - the "Client Query" button that used to sit in the
+              corner opposite pointed at the same intention and at a route
+              that no longer exists. See ENQUIRY_HREF. */}
+          <NavLink href={ENQUIRY_HREF}>Enquiry</NavLink>
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* The nav's other counterweight - see the note on the logo. */}
+        <div className="flex items-center gap-3 lg:flex-1 lg:justify-end">
           <ThemeToggle className="h-10 w-10" />
-
-          <div className="hidden lg:block">
-            <Button href="/client-query" variant="outline">
-              Client Query &#8599;
-            </Button>
-          </div>
         </div>
 
         <button
@@ -225,54 +260,67 @@ export function Header() {
                 <Link href="/" onClick={() => setMobileOpen(false)} className="text-h3 text-ink">
                   Home
                 </Link>
-                <Link href="/about" onClick={() => setMobileOpen(false)} className="text-h3 text-ink">
+                <Link
+                  href={ABOUT_HREF}
+                  onClick={() => setMobileOpen(false)}
+                  className="text-h3 text-ink"
+                >
                   About Us
                 </Link>
               </div>
 
-              <div className="flex flex-col gap-6">
+              {/* Five disciplines, no capability list under them - the
+                  same call the desktop MegaMenu makes, for the same
+                  reason, and it matters more here: twenty-one names in
+                  five repeating groups made this panel several screens of
+                  scroll on a phone. Every capability lives on the
+                  discipline pages now. */}
+              <div className="flex flex-col gap-4">
                 <Eyebrow>Services</Eyebrow>
-                {PILLARS.map((pillar) => (
-                  <div key={pillar.id}>
-                    <p className={cn("text-sm mb-2 font-semibold", pillar.ink)}>{pillar.name}</p>
-                    <ul className="flex flex-col gap-2">
-                      {SERVICES.filter((s) => s.pillar === pillar.id).map((service) => (
-                        <li key={service.slug}>
-                          <Link
-                            href={`/services/${service.slug}`}
-                            onClick={() => setMobileOpen(false)}
-                            className="text-body text-ink-body"
-                          >
-                            {service.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                {PILLARS.map((pillar) => {
+                  const Icon = pillar.icon;
+                  return (
+                    <Link
+                      key={pillar.id}
+                      href={`/services/${pillar.id}`}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 text-ink"
+                    >
+                      <Icon size={20} aria-hidden="true" className={cn("shrink-0", pillar.ink)} />
+                      <span className="text-body font-medium">{pillar.name}</span>
+                    </Link>
+                  );
+                })}
+                <Link
+                  href="/services"
+                  onClick={() => setMobileOpen(false)}
+                  className="text-small text-ink-body"
+                >
+                  Everything we run in-house &#8594;
+                </Link>
               </div>
 
-              <div className="flex flex-col gap-4">
-                <Eyebrow>Clients</Eyebrow>
-                {CLIENTS_LINKS.map((l) => (
-                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)} className="text-body text-ink">
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
+              {/* Two plain links where two link GROUPS used to be, so both
+                  take the text-h3 of the other top-level destinations
+                  rather than the text-body of a child item. Order matches
+                  the desktop bar. Enquiry also replaces the "Client Query"
+                  button that used to close this panel - one door, and the
+                  WhatsApp widget is already floating over this screen. */}
+              <Link
+                href={CLIENTS_HREF}
+                onClick={() => setMobileOpen(false)}
+                className="text-h3 text-ink"
+              >
+                Clients
+              </Link>
 
-              <div className="flex flex-col gap-4">
-                <Eyebrow>Contact</Eyebrow>
-                {CONTACT_LINKS.map((l) => (
-                  <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)} className="text-body text-ink">
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
-
-              <Button href="/client-query" variant="primary" className="justify-center">
-                Client Query &#8599;
-              </Button>
+              <Link
+                href={ENQUIRY_HREF}
+                onClick={() => setMobileOpen(false)}
+                className="text-h3 text-ink"
+              >
+                Enquiry
+              </Link>
             </Container>
           </motion.div>
         )}

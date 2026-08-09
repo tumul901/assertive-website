@@ -13,7 +13,7 @@ import {
 import { PinwheelMark } from "@/components/brand/PinwheelMark";
 import { PETALS, STEP } from "@/lib/data/petals";
 import { PILLARS } from "@/lib/data/pillars";
-import { SERVICES } from "@/lib/data/services";
+import { SERVICES, servicesIn } from "@/lib/data/services";
 import { useMotionStyles } from "@/lib/use-motion-styles";
 
 /*
@@ -118,7 +118,11 @@ const DISCIPLINES = PETALS.map((petal, i) => {
     index: String(i + 1).padStart(2, "0"),
     name: pillar.name,
     blurb: pillar.blurb,
-    services: SERVICES.filter((s) => s.pillar === petal.id),
+    // A capability can be sold under several petals, so the same pill
+    // appears on more than one beat - see the note at the top of
+    // services.ts. The pills wrap, so a longer list costs height, not
+    // layout.
+    services: servicesIn(petal.id),
   };
 });
 
@@ -289,8 +293,12 @@ export function HeroSequence() {
               >
                 Explore Our Work
               </Link>
+              {/* Was /about, now the About section further down this same
+                  page - there is no separate About page and never was.
+                  Sits directly above that section, so this is a short
+                  jump rather than a navigation. */}
               <Link
-                href="/about"
+                href="/#about"
                 className="rounded-md border border-hairline px-6 py-3 font-medium text-ink transition-colors duration-[var(--dur-fast)] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
               >
                 Know More About Us
@@ -401,7 +409,15 @@ export function HeroSequence() {
                         {d.services.map((s) => (
                           <li key={s.slug}>
                             <Link
-                              href={`/services/${s.slug}`}
+                              /* Was /services/<capability>, one page per
+                                 pill. There are five pages now, one per
+                                 discipline, so the pill points at THIS
+                                 discipline's page with its own capability
+                                 pre-opened - ServicePills reads the hash
+                                 on mount. The pill still lands on the
+                                 thing it names, which a bare link to the
+                                 discipline page would have lost. */
+                              href={`/services/${d.id}#${s.slug}`}
                               className="text-sm inline-block rounded-full border px-3.5 py-1.5 text-ink-body transition-colors duration-[var(--dur-fast)] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
                               style={{
                                 borderColor: `color-mix(in oklab, ${d.color} 45%, transparent)`,
@@ -430,8 +446,17 @@ export function HeroSequence() {
                     pointerEvents: beat === 6 ? "auto" : "none",
                   }}
                 >
+                  {/*
+                    COUNTED, not written out. This read "Sixteen services"
+                    for as long as there were sixteen, and stayed reading
+                    it for a while after the list was replaced - the exact
+                    failure the Footer's contact-details comment describes,
+                    a number living in two files where only one of them
+                    gets updated. A numeral in a display face is no worse
+                    than the word, and this one cannot go stale.
+                  */}
                   <h3 className="text-h2 max-w-[16ch] text-ink">
-                    Sixteen services. One accountable team.
+                    {SERVICES.length} services. One accountable team.
                   </h3>
                   <p className="text-body-lg mt-4 max-w-[46ch] text-ink-body">
                     Every figure in the mark is a discipline we run in-house,
@@ -451,7 +476,12 @@ export function HeroSequence() {
                       View All Services
                     </Link>
                     <Link
-                      href="/client-query"
+                      // Was /client-query, which no longer exists as a
+                      // concept anywhere on the site - the nav collapsed
+                      // its Contact menu and corner button into one
+                      // Enquiry anchor. This button already said "Start an
+                      // Enquiry"; now it goes to the form of that name.
+                      href="/#enquiry"
                       tabIndex={beat === 6 ? 0 : -1}
                       className="rounded-md border border-hairline px-6 py-3 font-medium text-ink transition-colors duration-[var(--dur-fast)] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
                     >
