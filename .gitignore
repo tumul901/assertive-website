@@ -47,3 +47,15 @@ next-env.d.ts
 .claude/
 .windsurf/
 skills-lock.json
+
+# Client source decks dropped into public/ for reference while writing
+# case-study copy. Everything under public/ is served at the URL root, so
+# a file left here is downloadable by anyone who guesses the name - and
+# the deploy pipeline copies the whole tree onto the VPS. These are the
+# client's internal materials and are not site assets: nothing in src/
+# links to them, they are only cited in comments in work.ts. Keep them on
+# disk locally, out of git and off the server.
+/public/*.pptx
+/public/*.ppt
+/public/*.pdf
+/public/*.docx
