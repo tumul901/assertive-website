@@ -32,7 +32,25 @@ import { WORK } from "@/lib/data/work";
  */
 export function CaseStudies() {
   return (
-    <Section as="section" className="bg-surface">
+    /*
+     * id="work" is the hero's "Explore Our Work" target and is public
+     * API the same way #about and #trusted-by are - see the note in
+     * Enquiry.tsx. It sits on the Section rather than on the carousel
+     * so the jump lands on the heading, which tells the reader what
+     * they have arrived at; anchoring the carousel alone would scroll
+     * the "Case Studies" title off the top of the screen.
+     *
+     * Deliberately NOT inside the Reveal below. A fragment jump
+     * positions the target by its rendered box, so an id on an element
+     * that enters from translateY would have its scroll-margin
+     * cancelled exactly as the reveal plays - the bug that put the
+     * Trusted by bar flush against the mobile header.
+     */
+    <Section
+      as="section"
+      id="work"
+      className="scroll-mt-[var(--header-h)] bg-surface"
+    >
       <Container>
         <div>
           <Eyebrow className="text-corporate-ink">Our work</Eyebrow>

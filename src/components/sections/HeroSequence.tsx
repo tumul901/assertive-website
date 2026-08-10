@@ -287,8 +287,13 @@ export function HeroSequence() {
               ref={ctaRef}
               className="mt-10 flex flex-wrap gap-4 motion-reduce:!opacity-100"
             >
+              {/* Was /work, which has never been built and 404d. The
+                  carousel further down this page is the whole of WORK
+                  rather than a selection from it, so there is nothing a
+                  separate archive page would add - id on the section in
+                  CaseStudies.tsx. */}
               <Link
-                href="/work"
+                href="/#work"
                 className="rounded-md bg-corporate-fill px-6 py-3 font-medium text-white transition-colors duration-[var(--dur-fast)] hover:bg-corporate-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
               >
                 Explore Our Work
@@ -324,7 +329,31 @@ export function HeroSequence() {
         </div>
 
         {/* ---- ACTS 2 + 3 ---- */}
-        <div className="absolute inset-0 flex flex-col px-6 lg:px-10 motion-reduce:static motion-reduce:py-24">
+        {/*
+         * pointer-events follows `entered`, and that is a bug fix, not a
+         * nicety. This layer is absolute inset-0 and comes AFTER Act 1
+         * in the DOM, so it paints on top of Act 1's two CTAs. Its panel
+         * is faded with opacity, and opacity: 0 hides an element from
+         * the eye but NOT from hit-testing - so before the first beat
+         * this invisible layer sat over "Explore Our Work" and "Know
+         * More About Us" and swallowed every click on them. Both buttons
+         * looked completely dead; elementFromPoint at their centres
+         * returned the pinwheel SVG in here rather than the links.
+         *
+         * The motion-reduce override is the trap in the fix. Under
+         * reduced motion the sequence never runs, so `entered` stays
+         * false forever while these acts are laid out statically and
+         * forced visible by motion-reduce:!opacity-100 below. Without
+         * the override, the fix would leave this layer's own links -
+         * the five disciplines, /services and /#enquiry - permanently
+         * unclickable for exactly the users least able to work around
+         * it.
+         */}
+        <div
+          className={`absolute inset-0 flex flex-col px-6 lg:px-10 motion-reduce:static motion-reduce:!pointer-events-auto motion-reduce:py-24 ${
+            entered ? "" : "pointer-events-none"
+          }`}
+        >
           <div className="mx-auto flex h-full w-full max-w-[1440px] flex-col">
             <div className="pt-[8svh] motion-reduce:pt-0">
               {/* ONE instance of this line for the whole sequence. */}
