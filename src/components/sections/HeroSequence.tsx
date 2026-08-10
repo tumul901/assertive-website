@@ -108,7 +108,31 @@ const ANCHOR_STYLE = {
   letterSpacing: "-0.035em",
 } as const;
 
-/** Beat 1 reveals the wheel; 1-5 are the petals; 6 is the close. */
+/*
+ * Beat 1 reveals the wheel; 1-5 are the petals; 6 is the close.
+ *
+ * WHAT ONE BEAT COSTS IN SCROLL - the number a visitor actually feels,
+ * and one that is invisible from this array on its own. useScroll with
+ * ["start start", "end end"] runs p from 0 to 1 over the wrapper's height
+ * MINUS one viewport, so the whole sequence is (wrapper - 100)svh of
+ * travel and a single beat is its gap here multiplied by that.
+ *
+ * At the 980svh this wrapper started at, that travel was 880svh, and the
+ * ~0.095 between beats put one petal turn at ~84svh - about 750px on a
+ * 900px-tall window, which is seven or eight wheel notches, or two to
+ * three trackpad flicks, PER PETAL. Five petals of that does not read as
+ * a slow sequence, it reads as the page having stopped responding.
+ *
+ * At 560svh the travel is 460svh and a beat is ~44svh, near enough one
+ * flick. Act 1 comes down with it: the headline wipe (p 0.04 -> 0.25) was
+ * 185svh, nearly two full screens to wipe one headline solid, and is now
+ * ~97svh.
+ *
+ * IF THE PACE NEEDS CHANGING AGAIN, CHANGE THE WRAPPER HEIGHT, NOT THESE.
+ * The fractions are the RHYTHM between the acts and are tuned against
+ * each other and against a dozen useTransform ranges below; the height is
+ * the SPEED, and it is the only knob here that can be turned on its own.
+ */
 const BEAT_AT = [0.47, 0.57, 0.66, 0.75, 0.84, 0.93];
 
 const DISCIPLINES = PETALS.map((petal, i) => {
@@ -201,7 +225,11 @@ export function HeroSequence() {
   useMotionStyles(lineRef, { opacity: lineOpacity, transform: lineTransform });
 
   return (
-    <div ref={wrapRef} className="relative h-[980svh] motion-reduce:h-auto">
+    // THE PACE OF THE WHOLE SEQUENCE IS THIS ONE NUMBER. It was 980svh,
+    // which cost seven or eight wheel notches per petal - see BEAT_AT for
+    // the arithmetic that turns a wrapper height into "how much scroll is
+    // one beat", and change it there rather than moving the beats.
+    <div ref={wrapRef} className="relative h-[560svh] motion-reduce:h-auto">
       {/* .hero-stage (globals.css): reserves Header's real height via
           --header-h so the two sticky elements never overlap. See the
           long comment there and in tokens.css. */}
