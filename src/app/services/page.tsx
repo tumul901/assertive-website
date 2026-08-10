@@ -8,6 +8,7 @@ import { Section } from "@/components/ui/Section";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
+import { CapabilityOrbit } from "@/components/services/CapabilityOrbit";
 import { SERVICES, servicesIn } from "@/lib/data/services";
 import { PILLARS, type Pillar } from "@/lib/data/pillars";
 
@@ -43,37 +44,66 @@ export default function ServicesPage() {
       <main>
         <Section as="section" className="bg-surface">
           <Container>
-            <Reveal className="max-w-[46ch]">
-              <Eyebrow className="text-corporate-ink">What we do</Eyebrow>
-              <h1 className="text-display mt-4 text-ink">One vendor. Every moving part.</h1>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <p className="text-body-lg mt-6 max-w-[62ch] text-ink-body">
-                Clients would rather brief one team than five, and that is the
-                whole argument for the pages below. The idea, the build, the
-                show, the guest list and the footage are all run in-house -
-                one contract, one point of contact, and nobody standing in
-                the venue explaining that this part is someone else&#39;s
-                scope.
-              </p>
-            </Reveal>
-            <Reveal delay={0.16}>
-              {/* COUNTED, not written out - see HeroSequence's closing
-                  beat, which logs why. A numeral cannot go stale when the
-                  list changes length; the word it replaced did. */}
-              <p className="text-body-lg mt-4 max-w-[62ch] text-ink-body">
-                Pick the discipline closest to your brief. All{" "}
-                {SERVICES.length} capabilities are on every one of the five
-                pages, because the discipline you came in through does not
-                change what we can put on the quote.
-              </p>
-            </Reveal>
+            {/*
+              TWO COLUMNS FROM xl, NOT lg. The orbit needs a real 560px to
+              keep its labels legible, and at lg that leaves the headline
+              about 400px - which puts a 65px display line onto five
+              stacked rows and looks far worse than having no figure at
+              all. From xl the text column still clears 580px and the
+              headline sits on three. Below that the hero stays the single
+              text column it already was.
+            */}
+            <div className="grid items-center gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-14">
+              <div>
+                {/*
+                  NO max-w-[46ch] HERE ANY MORE. ch is measured against
+                  the element's OWN font size, and this wrapper is 16px
+                  while the h1 inside it is 72px - so a cap meant to hold
+                  a comfortable reading measure was resolving to 464px and
+                  squeezing the display headline into five stacked lines
+                  inside a column offering 784px. The paragraphs below
+                  keep their own max-w in ch, correctly: they really are
+                  set at the size the ch is measured at.
+                */}
+                <Reveal>
+                  <Eyebrow className="text-corporate-ink">What we do</Eyebrow>
+                  <h1 className="text-display mt-4 text-balance text-ink">
+                    ONE PARTNER. ONE SEAMLESS EXPERIENCE.
+                  </h1>
+                </Reveal>
+                <Reveal delay={0.08}>
+                  <p className="text-body-lg mt-6 max-w-[62ch] text-ink-body">
+                    Clients would rather brief one team than five, and that is the
+                    whole argument for the pages below. The idea, the build, the
+                    show, the guest list and the footage are all run in-house -
+                    one contract, one point of contact, and nobody standing in
+                    the venue explaining that this part is someone else&#39;s
+                    scope.
+                  </p>
+                </Reveal>
+                <Reveal delay={0.16}>
+                  {/* COUNTED, not written out - see HeroSequence's closing
+                      beat, which logs why. A numeral cannot go stale when the
+                      list changes length; the word it replaced did. */}
+                  <p className="text-body-lg mt-4 max-w-[62ch] text-ink-body">
+                    Pick the discipline closest to your brief. All{" "}
+                    {SERVICES.length} capabilities are on every one of the five
+                    pages, because the discipline you came in through does not
+                    change what we can put on the quote.
+                  </p>
+                </Reveal>
 
-            <Reveal delay={0.24} className="mt-9">
-              <Button href="/#enquiry" variant="primary">
-                Send an Enquiry
-              </Button>
-            </Reveal>
+                <Reveal delay={0.24} className="mt-9">
+                  <Button href="/#enquiry" variant="primary">
+                    Send an Enquiry
+                  </Button>
+                </Reveal>
+              </div>
+
+              <Reveal delay={0.12} className="hidden xl:block">
+                <CapabilityOrbit />
+              </Reveal>
+            </div>
           </Container>
         </Section>
 

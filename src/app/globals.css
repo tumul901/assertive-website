@@ -256,6 +256,47 @@
     transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /*
+   * THE CAPABILITY ORBIT on /services - three rings of capability chips
+   * turning around the logo mark.
+   *
+   * PURE CSS, NOT motion/react, and that is the one decision here worth
+   * defending. This is the only animation on the site that never ends:
+   * twenty-two elements turning forever. A declarative keyframe on
+   * `rotate` is composited off the main thread and costs nothing per
+   * frame, where twenty-two JS-driven springs would run a rAF callback
+   * for the entire life of the page whether or not anyone is looking at
+   * it.
+   *
+   * ANIMATING `rotate`, NOT `transform`, is load-bearing. Each chip sits
+   * inside wrappers that already carry a static `transform` for its angle
+   * and its centring; the individual rotate property composes with those
+   * rather than overwriting them, which is what lets the chip cancel its
+   * ring's spin without having to restate the rest of the chain.
+   *
+   * NO REDUCED-MOTION OVERRIDE NEEDED. The blanket rule at the bottom of
+   * this file already pins animation-duration to 0.01ms and the iteration
+   * count to 1, which parks every one of these on rotate(±360deg) - the
+   * same place it started. The wheel simply stands still, fully composed,
+   * with every label upright and legible.
+   */
+  @keyframes orbit-cw {
+    to {
+      rotate: 360deg;
+    }
+  }
+  @keyframes orbit-ccw {
+    to {
+      rotate: -360deg;
+    }
+  }
+  .orbit-cw {
+    animation: orbit-cw var(--orbit-dur) linear infinite;
+  }
+  .orbit-ccw {
+    animation: orbit-ccw var(--orbit-dur) linear infinite;
+  }
+
   .wa-log::-webkit-scrollbar {
     width: 6px;
   }
