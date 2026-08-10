@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { HashLink } from "@/components/ui/HashLink";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { MegaMenu } from "@/components/layout/MegaMenu";
@@ -68,7 +69,16 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
   const pathname = usePathname();
   const active = pathname === href;
   return (
-    <Link
+    /*
+      HashLink, not Link. Three of the four items on this bar are
+      fragments on the homepage (ABOUT_HREF, CLIENTS_HREF, ENQUIRY_HREF),
+      and next/link turns the second and every later click on those into a
+      silent no-op once the fragment is already in the URL - see the note
+      in HashLink.tsx. A nav item that only works the first time is about
+      the worst place for that bug to live. Non-fragment hrefs pass
+      straight through to Link, so "Home" is unaffected.
+    */
+    <HashLink
       href={href}
       className="text-base relative inline-block py-2 font-medium text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
     >
@@ -79,7 +89,7 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
           aria-hidden="true"
         />
       )}
-    </Link>
+    </HashLink>
   );
 }
 
@@ -205,7 +215,33 @@ export function Header() {
           <Image src="/logo-mark.png" alt="" width={45} height={44} className="h-9 w-auto lg:h-10" priority />
           <span className="flex flex-col leading-none">
             <span className="text-lg font-bold text-ink lg:text-xl">Assertive</span>
-            <span className="text-small tracking-[0.04em] text-ink-muted">Brand Communications</span>
+            {/*
+              nowrap + a floor on the size, because this line is the first
+              thing on the site to break and the header is the worst place
+              for it to happen.
+
+              The bar is a fixed h-[72px] below lg, and the lockup competes
+              with the theme toggle and the hamburger for one row of it. At
+              320px the wordmark is squeezed to 143px against the ~143px
+              this string needs at 14px, so it wrapped to two lines: 28px of
+              "Assertive" plus 43px of tagline is 71.4px of text inside a
+              72px bar, sitting on the border with no room to breathe.
+
+              The clamp only bites where it has to - it solves to 14px at
+              360px and above, which is every size this already fit, and
+              eases to 12px at 320px, where the string measures ~123px and
+              has room again. whitespace-nowrap is what makes the shrink
+              load-bearing rather than cosmetic: without it the line would
+              still rather wrap than get smaller.
+
+              Arbitrary size rather than text-small because that token
+              carries its own line-height and weight (see tokens.css), and
+              overriding just the size would leave those behind - so 1.55 is
+              restated here, which is the value that token would have set.
+            */}
+            <span className="whitespace-nowrap text-[clamp(0.75rem,-0.25rem+5vw,0.875rem)] leading-[1.55] tracking-[0.04em] text-ink-muted">
+              Brand Communications
+            </span>
           </span>
         </Link>
 
@@ -260,13 +296,17 @@ export function Header() {
                 <Link href="/" onClick={() => setMobileOpen(false)} className="text-h3 text-ink">
                   Home
                 </Link>
-                <Link
+                {/* HashLink for the same reason NavLink uses it - and it
+                    matters twice over here, because closing the panel
+                    leaves the reader looking at whatever the no-op left on
+                    screen with no clue the tap did nothing. */}
+                <HashLink
                   href={ABOUT_HREF}
                   onClick={() => setMobileOpen(false)}
                   className="text-h3 text-ink"
                 >
                   About Us
-                </Link>
+                </HashLink>
               </div>
 
               {/* Five disciplines, no capability list under them - the
@@ -306,21 +346,21 @@ export function Header() {
                   the desktop bar. Enquiry also replaces the "Client Query"
                   button that used to close this panel - one door, and the
                   WhatsApp widget is already floating over this screen. */}
-              <Link
+              <HashLink
                 href={CLIENTS_HREF}
                 onClick={() => setMobileOpen(false)}
                 className="text-h3 text-ink"
               >
                 Clients
-              </Link>
+              </HashLink>
 
-              <Link
+              <HashLink
                 href={ENQUIRY_HREF}
                 onClick={() => setMobileOpen(false)}
                 className="text-h3 text-ink"
               >
                 Enquiry
-              </Link>
+              </HashLink>
             </Container>
           </motion.div>
         )}

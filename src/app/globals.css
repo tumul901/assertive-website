@@ -311,6 +311,79 @@
     background: rgb(255 255 255 / 0.24);
   }
 }
+/*
+ * ---- THE ABOUT PORTAL GIVES UP ON A SHORT SCREEN ----
+ *
+ * .pin-stage is 100svh - --header-h and it CLIPS, and .pin-layer centres
+ * its child inside it - so when the closing copy is taller than the stage
+ * the overflow is split across BOTH ends and the section quietly eats its
+ * own content. Measured at 360x667 before the mobile metrics in
+ * AboutPortal.tsx: 677.5px of copy in a 595.3px stage, 41px lost off the
+ * top (the About Us label) and 41px off the bottom (paragraph three
+ * stopping mid-sentence). Not recoverable by scrolling either - the
+ * timeline has run out by the time the copy is up, so there is nothing
+ * left to scroll.
+ *
+ * Those metrics bring the copy to 560.3px, which fits 667. This is the
+ * floor under that: below roughly 660px of viewport there is no type size
+ * that would fit three paragraphs and still be worth reading, so the
+ * portal stops being pinned and the section becomes an ordinary block
+ * that scrolls. The effect is lost, the words are not, and that is the
+ * right way round - the copy is the client's own About text and the zoom
+ * is decoration.
+ *
+ * WHY 660. The stage is 100svh - --header-h, so 660 - 72 = 588px of box
+ * against 560.3px of copy, i.e. it hands over just before the fit gets
+ * tight rather than at the moment it breaks.
+ *
+ * WHY NOT THE HERO'S STAGE TOO. .hero-stage is deliberately absent from
+ * every selector here. Its acts are sized in svh and it has no single
+ * block that must be read in full at one moment, so it degrades by
+ * getting tighter rather than by losing content - see the mobile note in
+ * HeroSequence.tsx for what it does instead.
+ *
+ * UNLAYERED, like the reduced-motion block below and for the same reason:
+ * Tailwind puts utilities in @layer utilities, and an unlayered rule beats
+ * any layered one outright. That is what lets these override the
+ * h-[360svh] and absolute utilities sitting on the same elements.
+ */
+@media (max-height: 660px) {
+  .pin-wrap {
+    height: auto;
+  }
+
+  .pin-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    transition: none;
+  }
+
+  /* Unpinned there is no scroll timeline to position against, so the
+     absolutely-positioned copy has to rejoin the flow, and it has to bring
+     its own vertical rhythm with it - inside the stage that spacing came
+     from being centred in a viewport-tall box. Matches the section padding
+     every other block on the page uses. */
+  .pin-layer {
+    position: static;
+    padding-block: clamp(64px, 8vw, 128px);
+  }
+
+  /* The zoom, the colour field, the scrim and the scroll cue are all only
+     meaningful against a pinned stage. */
+  .pin-portal {
+    display: none;
+  }
+
+  /* useMotionStyles writes opacity and transform as non-important inline
+     styles from a timeline that no longer runs here, which would leave
+     every strand at its p=0 value of opacity 0. Important beats inline. */
+  .pin-strata {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-stage,
   .pin-stage {

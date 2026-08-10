@@ -182,13 +182,48 @@ export function CaseStudyCarousel({ items }: { items: WorkItem[] }) {
         The arrows are shrink-0 so they never give up their forty-four
         pixels: they are the control most likely to be used on a phone, and
         a squashed arrow is worse than tighter dots.
+
+        ---- AND ON A PHONE THAT TRADE STOPPED BEING WORTH MAKING ----
+
+        Letting the dots absorb the whole shortfall works while the
+        shortfall is small. It is not: measured at 390px with fourteen
+        studies, the rail gets 222px for what wants 440, so every hit area
+        collapsed from its declared w-6 to EIGHT POINT FOUR PIXELS, on a
+        16.4px pitch. That is below the point where the comment two lines
+        down - "a 6px tap target is not a tap target" - stops being a
+        principle this code follows and starts being a description of what
+        it shipped. WCAG 2.5.8 wants 24px, or undersized targets spaced so
+        24px circles centred on them do not intersect; at 16.4px pitch it
+        fails both halves, and in the hand it means you cannot choose a
+        study, you can only hit whichever one your thumb lands nearest.
+
+        So below sm the dots are replaced by a plain position counter and
+        the rail is not rendered at all. Nothing is lost that a phone could
+        actually use: the arrows either side are full size, the panel takes
+        a swipe (see SWIPE), and the aria-live region below already
+        announces every change - the counter is aria-hidden precisely
+        because that region says the same thing better.
+
+        This also scales the way the dots never did. The rail was already
+        the one control whose width is a function of how much work the
+        agency has published; the counter reads the same at fourteen
+        studies as at forty. From sm up there is room - 472px against the
+        440 fourteen dots want - so the rail returns unchanged, shrink and
+        all, still able to give if the list outgrows even that.
       */}
       <div data-cs-controls="" className="mt-8 flex items-center justify-center gap-4">
         <Arrow label="Previous case study" onClick={() => go(active - 1)}>
           <ArrowLeft size={18} aria-hidden="true" />
         </Arrow>
 
-        <div className="flex min-w-0 items-center gap-2">
+        <p
+          aria-hidden="true"
+          className="text-small tabular-nums text-ink-muted sm:hidden"
+        >
+          {active + 1} / {items.length}
+        </p>
+
+        <div className="hidden min-w-0 items-center gap-2 sm:flex">
           {items.map((item, i) => {
             const on = i === active;
             const pillar = PILLARS.find((p) => p.id === item.pillar)!;

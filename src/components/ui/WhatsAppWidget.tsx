@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { X, Send, CheckCheck } from "lucide-react";
+import { HashLink } from "@/components/ui/HashLink";
 import { PILLARS } from "@/lib/data/pillars";
 import { PHONE } from "@/lib/data/contact";
 import { isValidEmail } from "@/lib/utils";
@@ -371,14 +371,32 @@ export function WhatsAppWidget() {
                   <Send size={15} aria-hidden="true" />
                 </a>
 
-                <Link
-                  href="#enquiry"
+                {/*
+                  "/#enquiry", not "#enquiry", and a plain <a>. Two
+                  separate bugs in one line.
+
+                  The widget is mounted in the ROOT LAYOUT, so it is on
+                  every page - but #enquiry only exists on the homepage.
+                  A bare "#enquiry" is resolved against the CURRENT URL,
+                  so from /services it pointed at /services#enquiry,
+                  matched nothing, and did nothing at all. Absolute, it
+                  goes to the form from anywhere.
+
+                  HashLink then handles the half that made it tempting to
+                  leave bare: this one link is same-document on / and
+                  cross-page everywhere else, and it picks per page - a
+                  native fragment jump on the homepage (which next/link
+                  would no-op on a repeat click, see HashLink.tsx), a
+                  client-side navigation from /services.
+                */}
+                <HashLink
+                  href="/#enquiry"
                   onClick={close}
                   className="mt-1 text-center text-xs underline underline-offset-2 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
                   style={{ color: PANEL.inkMuted, outlineColor: PANEL.action }}
                 >
                   {EMAIL_FALLBACK}
-                </Link>
+                </HashLink>
               </>
             )}
           </div>

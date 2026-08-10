@@ -460,14 +460,40 @@ export function AboutPortal() {
               </h2>
             </Stratum>
 
-            <div className="mt-8 grid gap-x-8 gap-y-10 md:grid-cols-3 md:gap-x-10">
+            {/*
+              THE TIGHTER MOBILE METRICS ARE LOAD-BEARING, not taste.
+
+              Below md these three stop being columns and become one stack,
+              which roughly triples the height of the only thing in this
+              section that has to fit a box it cannot grow: .pin-stage is
+              100svh - --header-h and it CLIPS. Worse, .pin-layer centres
+              its child, so overflow is split top and bottom and both ends
+              are lost at once - measured at 360x667, the copy came to
+              677.5px in a 595.3px stage and took 41px off each end, which
+              on screen meant the About Us label was gone and paragraph
+              three ended mid-sentence at "tailored to each", with no way
+              to scroll to the rest because the timeline has already
+              finished by then.
+
+              These four steps down - and text-body rather than
+              text-body-lg, 16px/1.6 against 17px/1.65 - measure at 560.3px,
+              which clears the same stage by 35px. Desktop keeps every
+              original value: at md the columns make the height a non-issue.
+
+              This buys the common phone, not every phone. Anything shorter
+              still cannot hold it, which is what the max-height rule in
+              globals.css is for - see the note there.
+            */}
+            <div className="mt-6 grid gap-x-8 gap-y-7 md:mt-8 md:grid-cols-3 md:gap-x-10 md:gap-y-10">
               {STRATA.map((s, i) => (
                 <Stratum key={s.key} p={p} at={[0.85 + i * 0.03, 0.91 + i * 0.03]}>
                   <span
                     aria-hidden="true"
                     className={`block h-1 w-14 rounded-full ${s.rule}`}
                   />
-                  <p className="text-body-lg mt-5 text-ink-body">{s.text}</p>
+                  <p className="text-body mt-4 text-ink-body md:text-body-lg md:mt-5">
+                    {s.text}
+                  </p>
                 </Stratum>
               ))}
             </div>
@@ -497,6 +523,12 @@ export function AboutPortal() {
  * under reduced motion these pin the strand to fully visible and beat
  * anything the scroll timeline tries to write. Without them the copy
  * would sit at its p=0 value, opacity 0, permanently invisible.
+ *
+ * pin-strata is the same guarantee for the OTHER mode that unpins this
+ * section - the short-viewport rule in globals.css. It cannot reuse the
+ * motion-reduce: variants above because those only compile against
+ * prefers-reduced-motion, so it needs a class of its own to aim at. It
+ * carries no styles until that media query matches.
  */
 function Stratum({
   p,
@@ -516,7 +548,7 @@ function Stratum({
   return (
     <div
       ref={ref}
-      className="motion-reduce:!opacity-100 motion-reduce:!transform-none"
+      className="pin-strata motion-reduce:!opacity-100 motion-reduce:!transform-none"
       style={{ opacity: 0 }}
     >
       {children}

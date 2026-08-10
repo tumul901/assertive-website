@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Plus, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { HashLink } from "@/components/ui/HashLink";
 import { Section } from "@/components/ui/Section";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/ui/Reveal";
@@ -160,13 +160,18 @@ export function FAQ() {
 
             <p className="text-body mt-10 text-ink-body">
               Anything else, ask directly.{" "}
-              <Link
-                href="#enquiry"
+              {/* HashLink, and absolute rather than a bare "#enquiry" -
+                  next/link turns a repeat click on a fragment already in
+                  the URL into a silent no-op, which is most of the point
+                  of a "send an enquiry" link at the bottom of the FAQ.
+                  See HashLink.tsx. */}
+              <HashLink
+                href="/#enquiry"
                 className="inline-flex items-center gap-1.5 font-medium text-ink underline underline-offset-4 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
               >
                 Send an enquiry
                 <ArrowRight size={16} aria-hidden="true" />
-              </Link>
+              </HashLink>
             </p>
           </Reveal>
         </div>

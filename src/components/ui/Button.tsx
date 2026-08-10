@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { HashLink } from "@/components/ui/HashLink";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "outline";
@@ -62,11 +62,21 @@ export function Button({
     </>
   );
 
+  /*
+    HashLink rather than Link, because the most common href passed to this
+    component IS a fragment: every "Send an Enquiry" button on the
+    services pages points at /#enquiry. Those happen to be cross-page
+    today, so Link was working for them by luck of where they sit - the
+    moment one of these buttons is used on the homepage it would inherit
+    the repeat-click no-op described in HashLink.tsx. Non-fragment hrefs
+    are handed straight to Link inside HashLink, so nothing changes for
+    the rest.
+  */
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <HashLink href={href} className={classes}>
         {content}
-      </Link>
+      </HashLink>
     );
   }
 

@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Mail, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { HashLink } from "@/components/ui/HashLink";
 import { PILLARS } from "@/lib/data/pillars";
 // Not local copies. These were literals here until a number change had to
 // be made in three files at once and this one was nearly missed - which is
@@ -161,14 +161,23 @@ function FooterColumn({ heading, children }: { heading: string; children: React.
   );
 }
 
+/*
+  HashLink handles both kinds of entry in these columns without them
+  having to be separated first: COMPANY_LINKS mixes homepage fragments
+  (/#about, /#trusted-by, /#enquiry) with a real route (/careers), and
+  the Services column is all real routes. Fragments pointing at the page
+  you are already on need the browser's native scroll-to-fragment, which
+  next/link suppresses on a repeat click - see HashLink.tsx. Everything
+  else falls through to Link exactly as before.
+*/
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link
+    <HashLink
       href={href}
       className="text-small w-fit transition-colors duration-[var(--dur-fast)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       style={{ color: "var(--color-footer-muted)" }}
     >
       {children}
-    </Link>
+    </HashLink>
   );
 }

@@ -11,6 +11,7 @@ import {
   type MotionValue,
 } from "motion/react";
 import { PinwheelMark } from "@/components/brand/PinwheelMark";
+import { HashLink } from "@/components/ui/HashLink";
 import { PETALS, STEP } from "@/lib/data/petals";
 import { PILLARS } from "@/lib/data/pillars";
 import { SERVICES, servicesIn } from "@/lib/data/services";
@@ -395,22 +396,33 @@ export function HeroSequence() {
                   rather than a selection from it, so there is nothing a
                   separate archive page would add - id on the section in
                   CaseStudies.tsx. */}
-              <Link
+              {/*
+               * HashLink, NOT Link, AND THAT IS THE WHOLE FIX FOR A
+               * REPORTED BUG: this button worked exactly once. next/link
+               * no-ops a click whose URL matches the current one, so once
+               * the first click had put /#work in the address bar, every
+               * later click did nothing - and a reader who scrolls back up
+               * to the hero is exactly the person who clicks it again.
+               * Measured from the same scrollY of 0: 7975 with the fix, 0
+               * without. Full reasoning in HashLink.tsx.
+               */}
+              <HashLink
                 href="/#work"
                 className="rounded-md bg-corporate-fill px-6 py-3 font-medium text-white transition-colors duration-[var(--dur-fast)] hover:bg-corporate-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
               >
                 Explore Our Work
-              </Link>
+              </HashLink>
               {/* Was /about, now the About section further down this same
                   page - there is no separate About page and never was.
                   Sits directly above that section, so this is a short
-                  jump rather than a navigation. */}
-              <Link
+                  jump rather than a navigation. HashLink for the reason
+                  spelled out on "Explore Our Work" above. */}
+              <HashLink
                 href="/#about"
                 className="rounded-md border border-hairline px-6 py-3 font-medium text-ink transition-colors duration-[var(--dur-fast)] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
               >
                 Know More About Us
-              </Link>
+              </HashLink>
             </div>
           </div>
         </div>
@@ -467,7 +479,32 @@ export function HeroSequence() {
           }`}
         >
           <div className="mx-auto flex h-full w-full max-w-[1440px] flex-col">
-            <div className="pt-[8svh] motion-reduce:pt-0">
+            {/*
+              ---- THE MOBILE VERTICAL BUDGET ----
+              (this block, the gap/padding below, and the mark's width)
+
+              .hero-stage is 100svh - --header-h and it clips, and below md
+              this act is ONE COLUMN: anchored line, then the mark, then a
+              discipline's number, name, blurb and up to eight capability
+              pills. Stacked, that wants more than the stage has. Measured
+              at 360x667 before these: the last pill of Corporate & MICE -
+              the widest list - sat 85.6px BELOW the stage floor, so the
+              bottom row of pills was simply gone and the beat dots were
+              painting over the row above it.
+
+              svh sizing does not save this on its own. On a real phone
+              100svh is the viewport with the browser chrome SHOWING, which
+              is well short of the window: an iPhone 14 reports 844 to a
+              desktop emulator but about 745svh in Safari, so the stage a
+              visitor actually gets is ~58px tighter than anything measured
+              on a desktop at the same nominal size. These steps down are
+              sized against that, not against the emulator.
+
+              At md the two-column grid puts the mark beside the copy
+              instead of above it and the pressure disappears, so every
+              original value returns there untouched.
+            */}
+            <div className="pt-[4svh] motion-reduce:pt-0 md:pt-[8svh]">
               {/* ONE instance of this line for the whole sequence. */}
               <h2
                 ref={lineRef}
@@ -479,10 +516,16 @@ export function HeroSequence() {
             </div>
 
             <div
-              className="grid flex-1 items-center gap-8 pb-[8svh] transition-opacity duration-[900ms] motion-reduce:!opacity-100 md:grid-cols-[minmax(0,42%)_minmax(0,1fr)] md:gap-14"
+              className="grid flex-1 items-center gap-5 pb-[3svh] transition-opacity duration-[900ms] motion-reduce:!opacity-100 md:grid-cols-[minmax(0,42%)_minmax(0,1fr)] md:gap-14 md:pb-[8svh]"
               style={{ opacity: entered ? 1 : 0 }}
             >
-              <div className="relative mx-auto w-[min(46vw,340px)] md:w-full md:max-w-[420px]">
+              {/* 34vw, not 46, and it is the single biggest line in the
+                  budget above: at 360px that is 122px of mark instead of
+                  166px. The wheel is the one element here that can give up
+                  height without giving up meaning - it is decorative, it
+                  already had a full act of its own at Act 1, and it is
+                  still the largest thing on the screen at this size. */}
+              <div className="relative mx-auto w-[min(34vw,300px)] md:w-full md:max-w-[420px]">
                 {/*
                   duration IS PART OF HOW FAST THIS SEQUENCE FEELS, and it
                   is the half that shortening the wrapper cannot reach.
@@ -563,11 +606,15 @@ export function HeroSequence() {
                       >
                         {d.index}
                       </span>
-                      <h3 className="text-h2 mt-3 text-ink">{d.name}</h3>
-                      <p className="text-body-lg mt-4 max-w-[46ch] text-ink-body">
+                      <h3 className="text-h2 mt-2 text-ink md:mt-3">{d.name}</h3>
+                      <p className="text-body mt-3 max-w-[46ch] text-ink-body md:text-body-lg md:mt-4">
                         {d.blurb}
                       </p>
-                      <ul className="mt-7 flex flex-wrap gap-2">
+                      {/* mt-4 rather than mt-7 below md. The pills are the
+                          last thing in the column, so every pixel above
+                          them is a pixel of the bottom row pushed under
+                          the stage floor. */}
+                      <ul className="mt-4 flex flex-wrap gap-2 md:mt-7">
                         {d.services.map((s) => (
                           <li key={s.slug}>
                             <Link
@@ -637,26 +684,44 @@ export function HeroSequence() {
                     >
                       View All Services
                     </Link>
-                    <Link
+                    <HashLink
                       // Was /client-query, which no longer exists as a
                       // concept anywhere on the site - the nav collapsed
                       // its Contact menu and corner button into one
                       // Enquiry anchor. This button already said "Start an
                       // Enquiry"; now it goes to the form of that name.
+                      // HashLink for the reason spelled out on "Explore
+                      // Our Work" in act 1.
                       href="/#enquiry"
                       tabIndex={beat === 6 ? 0 : -1}
                       className="rounded-md border border-hairline px-6 py-3 font-medium text-ink transition-colors duration-[var(--dur-fast)] hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-corporate-ink"
                     >
                       Start an Enquiry
-                    </Link>
+                    </HashLink>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/*
+              pointer-events-none, and it is the same trap the pinwheel
+              layer above already fell into once - an aria-hidden decoration
+              that is invisible to the eye but not to hit-testing.
+
+              This strip is inset-x-0, so its box is the FULL WIDTH of the
+              stage even though the dots themselves are a 100px cluster in
+              the middle. On a phone the pill list now reaches down into
+              that band: measured at 360x667 on Corporate & MICE, the widest
+              list, elementFromPoint at the centre of the last row returned
+              this div rather than the link, so the bottom third of "Travel"
+              and "Logistics" was simply dead to a thumb. Nothing here is
+              interactive - the dots are spans that report which beat you
+              are on - so there is no reason for the strip to take a tap
+              from anything underneath it.
+            */}
             <div
               aria-hidden="true"
-              className="absolute inset-x-0 bottom-6 flex justify-center gap-2 transition-opacity duration-[900ms] motion-reduce:hidden"
+              className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center gap-2 transition-opacity duration-[900ms] motion-reduce:hidden"
               style={{ opacity: entered ? 1 : 0 }}
             >
               {DISCIPLINES.map((d, i) => (
