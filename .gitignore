@@ -59,3 +59,16 @@ skills-lock.json
 /public/*.ppt
 /public/*.pdf
 /public/*.docx
+
+# Same rule, one directory down. The patterns above are anchored to the
+# root of public/, so the client's logo artwork - a Cloudflare cue card, a
+# MongoDB tent card and a Montra lockup, dropped into public/logos/ - was
+# not covered by them and would have shipped.
+#
+# These are SOURCE artwork, not site assets. The logos actually used by
+# the trust bar were extracted from them into public/media/clients (see
+# tools/build-client-logos.mjs, which reads from here), and those are
+# committed. Nothing in src/ references this directory. Kept on disk so
+# the extraction can be re-run or re-tuned without asking the client for
+# the files again.
+/public/logos/

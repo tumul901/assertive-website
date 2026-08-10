@@ -61,7 +61,22 @@ export function TrustBar() {
             aria-hidden="true"
           />
 
-          <ul className="grid w-full grid-cols-2 items-center gap-4 sm:flex sm:flex-1 sm:flex-wrap sm:justify-between sm:gap-6">
+          {/*
+            A GRID, NOT flex-wrap + justify-between, and that swap is what
+            makes a second row possible at all.
+
+            With five logos the row never wrapped, so justify-between just
+            spread them. At eight it wraps - and justify-between spaces
+            each row by its OWN item count, so a 5+3 break renders three
+            chips stretched across the full width under five tight ones,
+            which reads as a layout error rather than as a second row.
+
+            Fixed columns give both rows the same rhythm regardless of how
+            many logos there are: two up on a phone, four from sm, so eight
+            is 4+4 and a ninth would start a clean third row rather than
+            re-spacing everything below it.
+          */}
+          <ul className="grid w-full flex-1 grid-cols-2 items-center gap-4 sm:grid-cols-4 sm:gap-5">
             {CLIENTS.map((client) => (
               <li key={client.name} className="flex justify-center">
                 {/*
@@ -79,7 +94,7 @@ export function TrustBar() {
                   296px before this was split, which is how the wrap was
                   caught.
                 */}
-                <div className="flex h-26 w-full items-center justify-center rounded-md border border-chip-border bg-chip px-4 sm:h-20 sm:w-auto sm:min-w-[112px] xl:h-26 xl:min-w-[160px]">
+                <div className="flex h-26 w-full items-center justify-center rounded-md border border-chip-border bg-chip px-4 sm:h-20 xl:h-26">
                   {/*
                     h-20 against a 90px-tall source is 0.89x - very close to
                     1:1, and that is the ceiling. Past 90px these start
@@ -99,13 +114,45 @@ export function TrustBar() {
                     to their ink, which is an asset change and wants a look
                     at the result per logo, not a blind script run.
                   */}
+                  {/*
+                    max-w-full IS WHAT BALANCES THE ROW, and it is the one
+                    class doing real work here.
+
+                    h-* alone sets the height and lets the width follow the
+                    aspect ratio, which is fine while every logo is roughly
+                    as wide as it is tall. These are not: the eight run from
+                    1.45:1 (Reliance) to 6.72:1 (Cloudflare), and at a fixed
+                    80px height that last one wants 538px of width - four
+                    times its chip, so it would either overflow or force the
+                    column open and wreck the grid.
+
+                    With a width cap and object-contain, each logo takes
+                    whichever limit binds first: the compact marks hit the
+                    height and fill their chip, the wide lockups hit the
+                    width and settle shorter, centred, at their true aspect.
+                    That is the correct outcome rather than a compromise -
+                    a wordmark SHOULD read wider and shorter than a
+                    roundel, and nothing is cropped or distorted either way.
+                  */}
                   <Image
                     src={client.logo}
                     alt={client.name}
-                    width={140}
-                    height={90}
-                    sizes="140px"
-                    className="h-20 w-auto object-contain sm:h-12 xl:h-20"
+                    width={client.width}
+                    height={client.height}
+                    /* Chips are a quarter of an 1180px bar at the top end
+                       and about half a phone at the bottom, so a single
+                       fixed hint would over-fetch on one and under-fetch
+                       on the other. */
+                    sizes="(max-width: 640px) 45vw, 240px"
+                    /* 88%, not full. A width-capped logo would otherwise
+                       run right into the chip's px-4, while the compact
+                       marks - which cap on HEIGHT and never reach the
+                       sides - sit with obvious air around them. Measured
+                       at 1440: Cloudflare filled all 185px of the inner
+                       width while News18 used 90px of it, so the two chips
+                       read as different treatments rather than as the same
+                       one holding different logos. */
+                    className="max-h-20 w-auto max-w-[88%] object-contain sm:max-h-12 xl:max-h-20"
                   />
                 </div>
               </li>

@@ -336,7 +336,7 @@
   /* ---- header height reservation ----
      Header.tsx is sticky top-0. HeroSequence's pinned stage (.hero-stage
      in globals.css) is ALSO sticky top-0, since it has to stay fixed
-     while its 560svh wrapper scrolls past. Two things stuck to the same
+     while its 420svh wrapper scrolls past. Two things stuck to the same
      y:0 would fight for the same pixels for the whole intro sequence -
      concretely, the Act 2/3 anchored headline (which settles ~8svh from
      the top of the stage) would sit almost exactly under the header bar.

@@ -123,12 +123,19 @@ const ANCHOR_STYLE = {
  * three trackpad flicks, PER PETAL. Five petals of that does not read as
  * a slow sequence, it reads as the page having stopped responding.
  *
- * At 560svh the travel is 460svh and a beat is ~44svh, near enough one
- * flick. Act 1 comes down with it: the headline wipe (p 0.04 -> 0.25) was
- * 185svh, nearly two full screens to wipe one headline solid, and is now
- * ~97svh.
+ * A first pass at 560svh was measured in the browser at 373px per beat.
+ * That is under four notches of a 100px wheel - but a high-resolution
+ * wheel steps about 190px, which put it at almost exactly two, and two
+ * was still the complaint. Hence 420svh: travel 320svh, a beat ~29svh, or
+ * 259px at a 900px window. Act 1 comes down with it - the headline wipe
+ * (p 0.04 -> 0.25) was 185svh at the original 980, and is now ~67svh.
  *
- * IF THE PACE NEEDS CHANGING AGAIN, CHANGE THE WRAPPER HEIGHT, NOT THESE.
+ * HEIGHT IS ONLY HALF OF IT. The other half is how long the wheel takes
+ * to turn once a beat fires, which no wrapper height can reach - see the
+ * duration note on PinwheelMark below. Changing one without the other is
+ * why the first attempt at this landed short.
+ *
+ * IF THE PACE NEEDS CHANGING AGAIN, CHANGE THOSE TWO, NOT THESE.
  * The fractions are the RHYTHM between the acts and are tuned against
  * each other and against a dozen useTransform ranges below; the height is
  * the SPEED, and it is the only knob here that can be turned on its own.
@@ -206,6 +213,70 @@ export function HeroSequence() {
     document.documentElement.style.setProperty("--brand-hue", String(h));
   });
 
+  /*
+   * THE HAND-OFF. Everything above solves the sequence while it is PINNED;
+   * this is the only thing that deals with it ending, and without it the
+   * close is guillotined on the way out.
+   *
+   * .hero-stage reserves --header-h so the stage and the sticky Header
+   * never share pixels - but that reservation only holds while the stage
+   * is stuck. The instant p passes 1 the pin releases and the stage
+   * scrolls up like any ordinary block, straight behind a header that is
+   * still stuck at top-0. What that looks like was measured at 1536x744,
+   * ~200px past the end: the mark sliced clean across the middle of its
+   * top petal by the header edge, with the closing headline crammed into
+   * the strip underneath. It reads as a broken layout rather than as a
+   * section leaving, because a composed full-height frame with a 400px
+   * graphic in it is not what a header is normally asked to scroll over.
+   *
+   * The same window is where the Trusted by card arrives. It sits at
+   * -mt-16, so it laps 64px over the end of this wrapper - and the beat
+   * dots are pinned bottom-6, i.e. 24px up. Measured at both 1440x900 and
+   * 1536x744: the card covers the entire dot rail. Two independently
+   * chosen numbers that happen to cancel.
+   *
+   * Fading the layer out fixes both at once - there is nothing left to
+   * slice and nothing left under the card - but it CANNOT be driven by p.
+   *
+   * That was the first attempt and it is worth recording why it was
+   * wrong, because the fix looks correct until you stop scrolling in the
+   * wrong place. p is clamped to 1, and 1 is reached while the stage is
+   * still fully pinned and on screen - so a fade ending at p=1 has to run
+   * during the last stretch of BEAT 6, the one frame carrying "View All
+   * Services" and "Start an Enquiry". Measured at 420svh, beat 6 owns
+   * p 0.93 -> 1, which is 167px of scroll; fading across the back half of
+   * that left a reader who stopped at the end of the sequence looking at
+   * the close at under 30% opacity, with both CTAs nearly invisible. It
+   * removed the slice by deleting the ending.
+   *
+   * A SECOND useScroll, scoped to the exit, is what the timeline actually
+   * needs. ["end end", "end start"] runs 0 -> 1 as the wrapper's bottom
+   * edge travels from the bottom of the viewport to the top - which is
+   * exactly the window the pin has released into, and is one viewport
+   * tall. So the close holds at full strength right through p=1 and only
+   * then begins to go.
+   *
+   * 0.18 of that window is ~134px at a 744px viewport, and it is measured
+   * against the thing being protected rather than picked: the mark sits
+   * ~154px below the stage top, so the header edge first touches it at
+   * 0.21 of the exit. Finishing at 0.18 means the graphic is already gone
+   * before anything can cut it. The anchored line above it does pass the
+   * header while still faintly visible - unavoidable, it starts ~60px
+   * from the stage top - but a fading line slipping behind a header reads
+   * as leaving, which is what it is doing.
+   */
+  const { scrollYProgress: exit } = useScroll({
+    target: wrapRef,
+    offset: ["end end", "end start"],
+  });
+  /* The 0.04 lead-in is not a rounding fudge, it is the Header's own
+     height animation. It shrinks 110px -> 84px on scroll, which moves
+     every offset below it while this window is being measured - enough
+     that the close was reading 0.8 opacity at the exact moment the pin
+     released. The dead zone lets the ending land at full strength and
+     still finishes before 0.21, where the header edge reaches the mark. */
+  const handoff = useTransform(exit, [0.04, 0.2], [1, 0]);
+
   const eyebrowRef = useRef<HTMLParagraphElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
   const solidRef = useRef<HTMLDivElement>(null);
@@ -214,6 +285,7 @@ export function HeroSequence() {
   const markRef = useRef<HTMLDivElement>(null);
   const floodRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLHeadingElement>(null);
+  const actsRef = useRef<HTMLDivElement>(null);
 
   useMotionStyles(eyebrowRef, { opacity: uiOpacity });
   useMotionStyles(headlineRef, { opacity: headlineOpacity });
@@ -223,16 +295,19 @@ export function HeroSequence() {
   useMotionStyles(markRef, { opacity: markOpacity, transform: markTransform });
   useMotionStyles(floodRef, { opacity: floodOpacity });
   useMotionStyles(lineRef, { opacity: lineOpacity, transform: lineTransform });
+  useMotionStyles(actsRef, { opacity: handoff });
 
   return (
-    // THE PACE OF THE WHOLE SEQUENCE IS THIS ONE NUMBER. It was 980svh,
-    // which cost seven or eight wheel notches per petal - see BEAT_AT for
-    // the arithmetic that turns a wrapper height into "how much scroll is
-    // one beat", and change it there rather than moving the beats.
-    <div ref={wrapRef} className="relative h-[560svh] motion-reduce:h-auto">
+    // HALF OF HOW FAST THIS SEQUENCE FEELS IS THIS ONE NUMBER; the other
+    // half is the PinwheelMark duration further down, and neither alone
+    // is enough. See BEAT_AT for the arithmetic that turns a wrapper
+    // height into "how much scroll is one beat", and change it there
+    // rather than moving the beats.
+    <div ref={wrapRef} className="relative h-[420svh] motion-reduce:h-auto">
       {/* .hero-stage (globals.css): reserves Header's real height via
-          --header-h so the two sticky elements never overlap. See the
-          long comment there and in tokens.css. */}
+          --header-h so the two sticky elements never overlap while the
+          stage is PINNED. The hand-off out of the pin is a separate
+          problem with a separate fix - see `handoff` above. */}
       <div className="hero-stage">
         {/* ---- backdrop stack ---- */}
         <div
@@ -377,8 +452,17 @@ export function HeroSequence() {
          * unclickable for exactly the users least able to work around
          * it.
          */}
+        {/* motion-reduce:!opacity-100 is load-bearing, not tidiness. Under
+            reduced motion the timeline never advances, so `handoff` sits
+            at its p=0 value forever - which is 1 here, but only by luck of
+            the range direction. The override makes the static layout
+            independent of that, the same guard Stratum carries in
+            AboutPortal.tsx and for the same reason: an important rule in a
+            stylesheet outranks the non-important inline style
+            useMotionStyles writes. */}
         <div
-          className={`absolute inset-0 flex flex-col px-6 lg:px-10 motion-reduce:static motion-reduce:!pointer-events-auto motion-reduce:py-24 ${
+          ref={actsRef}
+          className={`absolute inset-0 flex flex-col px-6 lg:px-10 motion-reduce:static motion-reduce:!pointer-events-auto motion-reduce:!opacity-100 motion-reduce:py-24 ${
             entered ? "" : "pointer-events-none"
           }`}
         >
@@ -399,9 +483,30 @@ export function HeroSequence() {
               style={{ opacity: entered ? 1 : 0 }}
             >
               <div className="relative mx-auto w-[min(46vw,340px)] md:w-full md:max-w-[420px]">
+                {/*
+                  duration IS PART OF HOW FAST THIS SEQUENCE FEELS, and it
+                  is the half that shortening the wrapper cannot reach.
+
+                  The beat threshold fires the instant scroll crosses it,
+                  but the petal then takes this long to actually arrive,
+                  on an expo ease that spends most of its time settling.
+                  At the 0.9s default that is comfortably longer than the
+                  scroll it takes to cross a whole beat - so a reader
+                  nudges the wheel, sees almost nothing move, nudges again,
+                  and has now crossed two thresholds while watching one
+                  slow turn. It reads as "two scrolls per rotation" no
+                  matter how short the wrapper gets, which is exactly why
+                  the first pass at this - height alone - did not fix it.
+
+                  0.45 lands the turn inside a single beat's worth of
+                  scroll. Not lower: the rotation is the one thing on
+                  screen actually reporting that a beat happened, and a
+                  snap would lose the sense of the wheel being turned.
+                */}
                 <PinwheelMark
                   rotation={rotation}
                   filled={filled}
+                  duration={0.45}
                   className="h-auto w-full"
                 />
               </div>
