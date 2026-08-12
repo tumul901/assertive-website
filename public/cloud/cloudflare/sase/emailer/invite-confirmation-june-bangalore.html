@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+   
+
+<head>
+       <title>Cloudflare</title>
+	   <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+      <style type="text/css">
+         /* Client-specific Styles */
+         html {
+         width: 100% !important;
+         -webkit-text-size-adjust: 100%;
+         -ms-text-size-adjust: 100%;
+         margin: 0;
+         padding: 0;
+         background-color: #f6f6f6;
+		 font-family: 'Inter', Arial, sans-serif;
+         }
+         #outlook a {
+         padding: 0;
+         } /* Force Outlook to provide a "view in browser" menu link. */
+         body {
+         width: 100% !important;
+         -webkit-text-size-adjust: 100%;
+         -ms-text-size-adjust: 100%;
+         margin: 0;
+         padding: 0;
+         background-color: #f6f6f6;
+         }
+         /* Prevent Webkit and Windows Mobile platforms from changing default font sizes, while not breaking desktop design. */
+         .ExternalClass {
+         width: 100%;
+         } /* Force Hotmail to display emails at full width */
+         .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
+         line-height: 100%;
+         } /* Force Hotmail to display normal line spacing.*/
+         #backgroundTable {
+         margin: 0;
+         padding: 0;
+         width: 100% !important;
+         line-height: 100% !important;
+         }
+         img {
+         outline: none;
+         text-decoration: none;
+         border: none;
+         -ms-interpolation-mode: bicubic;
+         }
+         img {
+         border: none;
+         }
+         .image_fix {
+         display: block;
+         }
+         table td {
+         border-collapse: collapse;
+         }
+         table {
+         border-collapse: collapse;
+         mso-table-lspace: 0pt;
+         mso-table-rspace: 0pt;
+         }
+         /* iOS BLUE LINKS */
+         .appleBody a {
+         color: #00529E;
+         }
+         .appleFooter a {
+         color: #7CB3DA;
+
+         }
+         /* CUSTOM */
+         * {
+         font-family: 'Inter', Arial, sans-serif;
+         }
+         a {
+         color: #2279bc;
+         }
+         a[x-apple-data-detectors] {
+         color: inherit !important;
+         font-size: inherit !important;
+         font-family: inherit !important;
+         font-weight: inherit !important;
+         line-height: inherit !important;
+         }
+         /*STYLES*/
+         table[class="full"] {
+         width: 100%;
+         clear: both;
+         }
+         /*IPAD STYLES*/
+         @media only screen and (max-width: 640px) {
+         a[href^="tel"], a[href^="sms"] {
+         color: #f6f6f6; /* or whatever your want */
+         pointer-events: none;
+         cursor: default;
+         }
+         .mobile_link a[href^="tel"], .mobile_link a[href^="sms"] {
+         color: #fff !important;
+         pointer-events: auto;
+         cursor: default;
+         }
+         td[class="section-padding"] {
+         padding: 25px 5% 25px 5% !important;
+         }
+         td[class="no-padding"]{
+         padding:0px 0px 0px 0px!important;
+         }
+         table[class="responsive-table"] {
+         width: 100%!important;
+         height:auto!important;
+         }
+         td[class="full-column-width"] {
+         width: auto!important;
+         display: block!important;
+         vertical-align: top !important;
+         padding: 0px!important;
+         }  		 
+         img[class="img-max"] {
+         width: 100%!important;
+         height: auto!important;
+         }
+         img[class="img01"] {
+         width: 80%!important;
+         height: auto!important;
+         }
+         table[class="mobile-button-container"] {
+         margin: 0 auto;
+         width: 50% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container01"] {
+         margin: 0 auto;
+         width: 50% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container02"] {
+         margin: 0 auto;
+         width: 50% !important;
+         text-align: center !important;
+         margin-top:15px!important;
+         }
+         a[class="mobile-button"] {
+         width: 80% !important;
+         padding: 10px 15px !important;
+         border: 0 !important;
+         font-size: 15px !important;
+         text-align: center !important;
+         }
+         table[class="btn1"] {
+         width:50%!important;
+         }
+         td[class="auto-height"]{
+         height:auto!important;
+         }		
+         img[class="IDC_logo"]{
+         width:80px!important;
+         height:auto!important;
+         }			 
+         td[class="section-title"]{
+         font-size:18px!important;
+         line-height:auto!important;
+         }
+         td[class="last-section1"]{
+         vertical-align:bottom!important;
+         width:80%!important;
+         }
+         td[class="last-section2"]{
+         vertical-align:bottom!important;
+         width:20%!important;
+         }
+         td[class="speaker-title"]{
+         padding-top:15px!important;
+         text-align:center!important;
+         }
+         td[class="full_column"] {
+         width: auto!important;
+         display: block!important;
+         vertical-align: top !important;
+         padding: 10px!important;
+         border: none!important;
+         }
+         td[class="centertext"]{
+         text-align:center!important;
+         }
+         img[class="speaker-img"]{
+         width:150px!important;
+         height:auto!important;
+         }
+         /*IPHONE STYLES*/
+         @media only screen and (max-width: 480px) {
+         a[href^="tel"], a[href^="sms"] {
+         color: #f6f6f6; /* or whatever your want */
+         pointer-events: none;
+         cursor: default;
+         }
+         table[class="btn1"] {
+         width:50%!important;
+         }
+         .mobile_link a[href^="tel"], .mobile_link a[href^="sms"] {
+         text-decoration: default;
+         color: #0a8cce !important;
+         pointer-events: auto;
+         cursor: default;
+         }
+         td[class="mobile-hide"] {
+         display: none!important;
+         }
+         table[class="btn1"] {
+         width:80%!important;
+         }
+         table[class="mobile-button-container"] {
+         margin: 0 auto;
+         width: 80% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container01"] {
+         margin: 0 auto;
+         width: 90% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container02"] {
+         margin: 0 auto;
+         width: 90% !important;
+         text-align: center !important;
+         }
+         }
+      </style>
+   </head>
+   <body style="margin: 0; padding: 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#dedede; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+         <tbody>
+            <tr>
+               <td style="padding:0px 0px 20px 0px;"  class="section-padding">
+                  <table width="650" cellpadding="0" cellspacing="0" border="0" align="center" class="responsive-table" style="margin:0 auto;">
+                     <tbody>
+                        <tr bgcolor="#dedede">
+                          <td align="left" valign="middle" bgcolor="#dedede" style="padding:5px;font-family: 'Inter', Arial, sans-serif; font-size:11px; text-align:center; color:#333333; line-height:16px;">If you cannot view the images <a href="https://assertivebrand.co.in/cloud/cloudflare/sase/emailer/invite-confirmation-june-bangalore.html" style=" color:#333333;">click here</a></td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <!-- Start of main-banner -->
+                              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                                 <tbody>
+                                    <tr>
+                                       <td style="background-color:#FFFFFF;">
+                                          <table width="650" align="center" cellspacing="0" cellpadding="0" border="0" class="responsive-table" >
+                                             <tbody>
+                                                <!-- start of image -->
+                                                <tr>
+                                                   <td align="center"><img src="https://assertivbrand.co.in/cloud/cloudflare/sase/emailer/images/header-march-Bangalore.jpg" width="650" alt="header" border="0" style="display:block; border:none; outline:none; text-decoration:none;" class="img-max">
+                                                  </td>
+                                                </tr>
+                                                <!-- end of image --> 
+                                                <!-- start of content -->
+                                                <tr>
+                                                   <td>
+                                                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+														 <tr>
+                                             
+														   <td style="background-color:#FFFFFF; padding:15px 34px 15px 34px; line-height:20px; font-family: 'Inter', Arial, sans-serif;font-size: 16px; color: #24211a;">
+														   Dear [Name],
+                                <br><br>
+                                Thank you for registering for <strong>Cloudflare AI Security Roadshow Bangalore. </strong> This is to inform you that your registration is <strong>CONFIRMED.</strong>
+                                                            <!--<p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;">Join us to learn how Cloudflare’s unified, cloud-native platform helps you connect and protect your people, applications, networks, and AI tools—without the complexity of fragmented security solutions.</p>-->
+                                                             <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;"><p>Don't forget to keep your calendars blocked for 05<sup>th</sup>June 2026.</p><p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;"><strong>Event details:</strong></p>
+                                                             <!--<table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                               <tbody>
+                                                                 <tr>
+                                                                   <td width="4%" valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;">•</td>
+                                                                   <td width="96%" valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;"><strong>Govern Workforce GenAI:</strong> Gain total visibility into how your teams use tools like ChatGPT and Claude.</td>
+                                                                 </tr>
+                                                                 <tr>
+                                                                   <td valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;">•</td>
+                                                                   <td valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;"><strong>Shield Agentic AI:</strong> Secure autonomous AI access to your critical apps and data.</td>
+                                                                 </tr>
+                                                                 <tr>
+                                                                   <td valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;">•</td>
+                                                                   <td valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;"><strong>Defend Applications:</strong> Prevent data leakage and sophisticated attacks on your AI-powered apps & bots.</td>
+                                                                 </tr>
+                                                                  <tr>
+                                                                   <td valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;">•</td>
+                                                                   <td valign="top" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:3px;"><strong>Build on Zero Trust:</strong>  Deploy AI safely using a unified, world-class foundation.</td>
+                                                                 </tr>
+                                                               </tbody>
+                                                             </table>--!>
+														     <!--<p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;"><strong>Collaborate. Network. Lead.</strong> Connect with fellow innovators to turn these "here and now" challenges into your competitive advantage.</p>--!>
+                                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
+														       <tbody>
+														         <tr>
+														           <td width="100%" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+														             <tbody>
+														               <tr>
+														                 <td width="33%" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding: 5px; text-align: center; padding-top: 20px;"><img src="https://webvynx.in/cloud/cloudflare/elite-experience/images/date.jpg" width="27" height="27" alt=""/></td>
+														                 <td width="34%" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding: 5px; text-align: center; padding-top: 20px;"><img src="https://webvynx.in/cloud/cloudflare/elite-experience/images/location.jpg" width="27" height="27" alt=""/></td>
+														                 <td width="33%" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding: 5px; text-align: center; padding-top: 20px;"><img src="https://webvynx.in/cloud/cloudflare/elite-experience/images/time.jpg" width="27" height="27" alt=""/></td>
+													                   </tr>
+														               <tr>
+														                 <td valign="top" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding: 5px; text-align: center;">05<sup>th</sup> June 2026<br>(<a href="https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=MzAzYm91ZjJhY3ZlOXY5N2U2Y2RsZ3RvMzQgcnN2cEBhc3NlcnRpdmVicmFuZC5jby5pbg&tmsrc=rsvp%40assertivebrand.co.in"target="_blank">Add to calendar</a>)</td>
+														                 <td valign="top" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding: 5px; text-align: center;">Panorama Hall<br>Marriott Executive Apartments Bangalore
+														                   (<a href="https://maps.app.goo.gl/qnXYKv54UFdQB2vbA" target="_blank">view map</a>)</td>
+														                 <td valign="top" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding: 5px; text-align: center;">6:30 PM Onwards</td>
+													                   </tr>
+														               <tr>
+														                 <td colspan="3" valign="top" bgcolor="#fff5f3" style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; padding:0px; text-align: center; padding-top: 20px; padding-bottom: 20px;"><table align="center" width="160px" border="0" cellpadding="0" cellspacing="0">
+														                   <tbody>
+														                     <tr>
+														                       <!--<td width="100%" align="center" bgcolor="#FF4411" style="padding: 7px 0px; font-family: Arial, Helvetica, sans-serif;font-size:15px;"><a href="https://fieldmarketing.www.cloudflare.com/AISecurityRoadshowDelhi" style="color:#fff;text-decoration:none; font-family: 'Inter', Arial, sans-serif; font-size: 16px;" target="_blank" rel="noreferrer"><strong>Register Now</strong></a></td>--!>
+													                         </tr>
+													                       </tbody>
+													                     </table></td>
+													                   </tr>
+													                 </tbody>
+													               </table></td>
+													             </tr>
+													           </tbody>
+													         </table>
+                                                             <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;">In addition, we would like to inform you that we are offering a pick-up & drop-off service for your convenience. If you didn’t opt-in for the cab service and would like to now, please submit your details via this <a href="https://docs.google.com/forms/d/e/1FAIpQLSdUc_8AnLaryN-faBmafXqEotxI--rAx1-V7TYDGJHGKTCgQg/viewform">Google form.</a></p>
+															 <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;">See you soon!</p>
+														     <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;">Kind Regards,<br>On behalf of Cloudflare</p>
+															 <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left;">*Please note that this invitation is exclusive and non-transferrable.</p>
+													       </td>
+													    </tr>
+                                                      </table>
+                                                   </td>
+                                                </tr>
+                                                <!-- end of content --> 
+                                             </tbody>
+                                          </table>
+                                       </td>
+                                    </tr>
+                                 </tbody>
+                              </table>
+                           </td>
+                        </tr>
+                        <!--------------start of footer-------------->
+                        <!--------------end of footer-------------->
+                     </tbody>
+                     <!----------closing of main wrapper 600--------->
+                  </table>
+               </td>
+            </tr>
+            <tr>
+              <td style="padding:0px 0px 20px 0px;"  class="section-padding">&nbsp;</td>
+            </tr>
+         </tbody>
+      </table>
+      <!----------closing of body wrapper 100%--------->
+   </body>
+
+</html>

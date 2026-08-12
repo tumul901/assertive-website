@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+   
+
+<head>
+       <title>Cloudflare</title>
+	   <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+      <style type="text/css">
+         /* Client-specific Styles */
+         html {
+         width: 100% !important;
+         -webkit-text-size-adjust: 100%;
+         -ms-text-size-adjust: 100%;
+         margin: 0;
+         padding: 0;
+         background-color: #FFFFFF;
+		 font-family: 'Inter', Arial, sans-serif;
+         }
+         #outlook a {
+         padding: 0;
+         } /* Force Outlook to provide a "view in browser" menu link. */
+         body {
+         width: 100% !important;
+         -webkit-text-size-adjust: 100%;
+         -ms-text-size-adjust: 100%;
+         margin: 0;
+         padding: 0;
+         background-color: #FFFFFF;
+         }
+         /* Prevent Webkit and Windows Mobile platforms from changing default font sizes, while not breaking desktop design. */
+         .ExternalClass {
+         width: 100%;
+         } /* Force Hotmail to display emails at full width */
+         .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
+         line-height: 100%;
+         } /* Force Hotmail to display normal line spacing.*/
+         #backgroundTable {
+         margin: 0;
+         padding: 0;
+         width: 100% !important;
+         line-height: 100% !important;
+         }
+         img {
+         outline: none;
+         text-decoration: none;
+         border: none;
+         -ms-interpolation-mode: bicubic;
+         }
+         img {
+         border: none;
+         }
+         .image_fix {
+         display: block;
+         }
+         table td {
+         border-collapse: collapse;
+         }
+         table {
+         border-collapse: collapse;
+         mso-table-lspace: 0pt;
+         mso-table-rspace: 0pt;
+         }
+         /* iOS BLUE LINKS */
+         .appleBody a {
+         color: #00529E;
+         }
+         .appleFooter a {
+         color: #7CB3DA;
+
+         }
+         /* CUSTOM */
+         * {
+         font-family: 'Inter', Arial, sans-serif;
+         }
+         a {
+         color: #2279bc;
+         }
+         a[x-apple-data-detectors] {
+         color: inherit !important;
+         font-size: inherit !important;
+         font-family: inherit !important;
+         font-weight: inherit !important;
+         line-height: inherit !important;
+         }
+         /*STYLES*/
+         table[class="full"] {
+         width: 100%;
+         clear: both;
+         }
+         /*IPAD STYLES*/
+         @media only screen and (max-width: 640px) {
+         a[href^="tel"], a[href^="sms"] {
+         color: #f6f6f6; /* or whatever your want */
+         pointer-events: none;
+         cursor: default;
+         }
+         .mobile_link a[href^="tel"], .mobile_link a[href^="sms"] {
+         color: #fff !important;
+         pointer-events: auto;
+         cursor: default;
+         }
+         td[class="section-padding"] {
+         padding: 25px 5% 25px 5% !important;
+         }
+         td[class="no-padding"]{
+         padding:0px 0px 0px 0px!important;
+         }
+         table[class="responsive-table"] {
+         width: 100%!important;
+         height:auto!important;
+         }
+         td[class="full-column-width"] {
+         width: auto!important;
+         display: block!important;
+         vertical-align: top !important;
+         padding: 0px!important;
+         }  		 
+         img[class="img-max"] {
+         width: 100%!important;
+         height: auto!important;
+         }
+         img[class="img01"] {
+         width: 80%!important;
+         height: auto!important;
+         }
+         table[class="mobile-button-container"] {
+         margin: 0 auto;
+         width: 50% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container01"] {
+         margin: 0 auto;
+         width: 50% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container02"] {
+         margin: 0 auto;
+         width: 50% !important;
+         text-align: center !important;
+         margin-top:15px!important;
+         }
+         a[class="mobile-button"] {
+         width: 80% !important;
+         padding: 10px 15px !important;
+         border: 0 !important;
+         font-size: 15px !important;
+         text-align: center !important;
+         }
+         table[class="btn1"] {
+         width:50%!important;
+         }
+         td[class="auto-height"]{
+         height:auto!important;
+         }		
+         img[class="IDC_logo"]{
+         width:80px!important;
+         height:auto!important;
+         }			 
+         td[class="section-title"]{
+         font-size:18px!important;
+         line-height:auto!important;
+         }
+         td[class="last-section1"]{
+         vertical-align:bottom!important;
+         width:80%!important;
+         }
+         td[class="last-section2"]{
+         vertical-align:bottom!important;
+         width:20%!important;
+         }
+         td[class="speaker-title"]{
+         padding-top:15px!important;
+         text-align:center!important;
+         }
+         td[class="full_column"] {
+         width: auto!important;
+         display: block!important;
+         vertical-align: top !important;
+         padding: 10px!important;
+         border: none!important;
+         }
+         td[class="centertext"]{
+         text-align:center!important;
+         }
+         img[class="speaker-img"]{
+         width:150px!important;
+         height:auto!important;
+         }
+         /*IPHONE STYLES*/
+         @media only screen and (max-width: 480px) {
+         a[href^="tel"], a[href^="sms"] {
+         color: #f6f6f6; /* or whatever your want */
+         pointer-events: none;
+         cursor: default;
+         }
+         table[class="btn1"] {
+         width:50%!important;
+         }
+         .mobile_link a[href^="tel"], .mobile_link a[href^="sms"] {
+         text-decoration: default;
+         color: #0a8cce !important;
+         pointer-events: auto;
+         cursor: default;
+         }
+         td[class="mobile-hide"] {
+         display: none!important;
+         }
+         table[class="btn1"] {
+         width:80%!important;
+         }
+         table[class="mobile-button-container"] {
+         margin: 0 auto;
+         width: 80% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container01"] {
+         margin: 0 auto;
+         width: 90% !important;
+         text-align: center !important;
+         }
+         table[class="mobile-button-container02"] {
+         margin: 0 auto;
+         width: 90% !important;
+         text-align: center !important;
+         }
+         }
+      </style>
+   </head>
+   <body style="margin: 0; padding: 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFFFFF; border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+         <tbody>
+            <tr>
+               <td style="padding:0px 0px 20px 0px;"  class="section-padding">
+                  <table width="650" cellpadding="0" cellspacing="0" border="0" align="center" class="responsive-table" style="margin:0 auto; border:1px solid #cccccc;">
+                     <tbody>
+                        <tr bgcolor="#FFFFFF">
+                          <td align="left" valign="middle" bgcolor="#FFFFFF" style="padding:5px;font-family: 'Inter', Arial, sans-serif; font-size:11px; text-align:center; color:#333333; line-height:16px;">If you cannot view the images <a href="https://assertivebrand.co.in/cloud/cloudflare/sase/emailer/unconfirmed-cloudflare-Immerse-Bengaluru.html" style=" color:#333333;">click here</a></td>
+                        </tr>
+                        <tr>
+                           <td>
+                              <!-- Start of main-banner -->
+                              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+                                 <tbody>
+                                    <tr>
+                                       <td style="background-color:#FFFFFF;">
+                                          <table width="650" align="center" cellspacing="0" cellpadding="0" border="0" class="responsive-table" >
+                                             <tbody>
+                                                <!-- start of image -->
+                                                <tr>
+                                                   <td align="center"><img src="https://assertivebrand.co.in/cloud/cloudflare/sase/emailer/images/header-august-Bangalore.jpg" width="650" alt="header" border="0" style="display:block; border:none; outline:none; text-decoration:none;" class="img-max">
+                                                  </td>
+                                                </tr>
+                                                <!-- end of image --> 
+                                                <!-- start of content -->
+                                                <tr>
+                                                   <td>
+                                                      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+														 <tr>
+                                             
+														   <td style="background-color:#FFFFFF; padding:15px 34px 15px 34px; line-height:20px; font-family: 'Inter', Arial, sans-serif;font-size: 16px; color: #24211a;">
+														   Dear [Name],<br><br>
+                                Thank you for registering for <strong>Cloudflare Immerse Bengaluru on 7th Aug 2026.</strong>                                 
+								<p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; margin:10px 0 8px 0;">Due to overwhelming response and limited seats, we are unable to confirm your registration for the event.</p>
+                                <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; margin:10px 0 30px 0;">We regret any inconvenience caused and will keep you updated on our future events.</p
+		                                        <p style="font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #24211a; text-align: left; margin:0 0 8px 0;">Kind Regards,<br>On behalf of Cloudflare</p>
+															 
+													       </td>
+													    </tr>
+                                                      </table>
+                                                   </td>
+                                                </tr>
+                                                <!-- end of content --> 
+                                             </tbody>
+                                          </table>
+                                       </td>
+                                    </tr>
+                                 </tbody>
+                              </table>
+                           </td>
+                        </tr>
+                        <!--------------start of footer-------------->
+                        <!--------------end of footer-------------->
+                     </tbody>
+                     <!----------closing of main wrapper 600--------->
+                  </table>
+               </td>
+            </tr>
+            <tr>
+              <td style="padding:0px 0px 20px 0px;"  class="section-padding">&nbsp;</td>
+            </tr>
+         </tbody>
+      </table>
+      <!----------closing of body wrapper 100%--------->
+   </body>
+
+</html>

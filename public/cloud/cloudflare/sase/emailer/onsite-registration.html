@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onsite Registration — Cloudflare Immerse Bengaluru</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c1a16;
+    --paper:#fdfbf7;
+    --panel:#ffffff;
+    --line:#e7e1d6;
+    --accent:#f4792c;
+    --accent-dark:#c85a17;
+    --accent-tint:#fff1e6;
+    --ok:#1c7a4d;
+    --ok-tint:#e9f7ef;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+  .masthead{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:18px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+  }
+  .masthead .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent-dark);
+    margin:0 0 6px;
+  }
+  .masthead h1{
+    margin:0;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .masthead .meta{
+    font-size:13px;
+    color:#6b6558;
+    margin-top:6px;
+  }
+  .masthead .count{
+    text-align:right;
+    font-family:var(--mono);
+  }
+  .masthead .count .num{
+    font-size:34px;
+    font-weight:600;
+    color:var(--accent-dark);
+    line-height:1;
+  }
+  .masthead .count .lbl{
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#8a8375;
+    margin-top:4px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.1fr 1.5fr;
+    gap:24px;
+  }
+  @media (max-width: 760px){
+    .grid{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:24px;
+  }
+  .panel h2{
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin:0 0 18px;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .panel h2::before{
+    content:"";
+    width:8px;height:8px;
+    background:var(--accent);
+    border-radius:50%;
+    display:inline-block;
+  }
+
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    margin:0 0 6px;
+    color:#3a362e;
+  }
+  label .req{ color:var(--accent-dark); }
+  .field{ margin-bottom:16px; }
+  input[type=text], input[type=email], input[type=tel]{
+    width:100%;
+    padding:11px 12px;
+    font-size:15px;
+    font-family:var(--sans);
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    background:#fff;
+    color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-tint);
+  }
+  input.err{ border-color:#c0392b; }
+  .errmsg{
+    font-size:11.5px;
+    color:#c0392b;
+    margin-top:4px;
+    min-height:14px;
+  }
+
+  .btnrow{ display:flex; gap:10px; margin-top:20px; }
+  button{
+    font-family:var(--sans);
+    font-size:14.5px;
+    font-weight:600;
+    border-radius:7px;
+    padding:12px 18px;
+    cursor:pointer;
+    border:1.5px solid transparent;
+    transition:transform .08s ease, opacity .15s ease;
+  }
+  button:active{ transform:scale(0.98); }
+  .btn-primary{
+    background:var(--accent);
+    color:#fff;
+    flex:1;
+  }
+  .btn-primary:hover{ background:var(--accent-dark); }
+  .btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-ghost{
+    background:transparent;
+    border-color:var(--line);
+    color:#6b6558;
+  }
+  .btn-ghost:hover{ border-color:#b9b1a0; color:var(--ink); }
+
+  .toast{
+    margin-top:14px;
+    background:var(--ok-tint);
+    color:var(--ok);
+    border:1px solid #bfe6cf;
+    border-radius:7px;
+    padding:10px 12px;
+    font-size:13px;
+    font-weight:600;
+    display:none;
+    align-items:center;
+    gap:8px;
+  }
+  .toast.show{ display:flex; }
+
+  /* Roster panel */
+  .roster-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .roster-head h2{ margin:0; }
+  .download{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    background:var(--ink);
+    color:#fff;
+    padding:9px 14px;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:600;
+    border:none;
+    cursor:pointer;
+  }
+  .download:hover{ background:#33301f; }
+  .download:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .admin-lock{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:transparent;
+    color:#8a8375;
+    padding:9px 14px;
+    border-radius:7px;
+    font-size:13px;
+    font-weight:600;
+    border:1.5px solid var(--line);
+    cursor:pointer;
+  }
+  .admin-lock:hover{ border-color:#b9b1a0; color:var(--ink); }
+
+  .modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(28,26,22,0.45);
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:#fff;
+    border-radius:10px;
+    padding:26px;
+    width:100%;
+    max-width:320px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-box h3{
+    margin:0 0 6px;
+    font-size:16px;
+  }
+  .modal-box p{
+    margin:0 0 16px;
+    font-size:12.5px;
+    color:#8a8375;
+  }
+  .modal-box input{
+    width:100%;
+    padding:11px 12px;
+    font-size:16px;
+    letter-spacing:.15em;
+    text-align:center;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    font-family:var(--mono);
+    margin-bottom:8px;
+  }
+  .modal-box input:focus{ outline:none; border-color:var(--accent); }
+  .modal-err{
+    font-size:12px;
+    color:#c0392b;
+    min-height:16px;
+    margin-bottom:10px;
+  }
+  .modal-btns{ display:flex; gap:8px; }
+  .modal-btns button{ flex:1; font-size:13.5px; padding:10px; }
+
+  .search{
+    width:100%;
+    padding:9px 12px;
+    font-size:13.5px;
+    border:1.5px solid var(--line);
+    border-radius:7px;
+    margin-bottom:14px;
+    font-family:var(--sans);
+  }
+  .search:focus{ outline:none; border-color:var(--accent); }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  thead th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:#8a8375;
+    padding:0 10px 8px;
+    border-bottom:1.5px solid var(--line);
+  }
+  tbody td{
+    padding:10px 10px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#fbf8f2; }
+  .name-cell{ font-weight:600; }
+  .sub-cell{ color:#8a8375; font-size:11.5px; }
+  .del{
+    background:none;
+    border:none;
+    color:#b9b1a0;
+    cursor:pointer;
+    font-size:16px;
+    padding:2px 6px;
+    line-height:1;
+  }
+  .del:hover{ color:#c0392b; }
+
+  .empty{
+    text-align:center;
+    padding:50px 20px;
+    color:#a39c8c;
+  }
+  .empty .big{ font-size:32px; margin-bottom:8px; }
+  .empty p{ margin:0; font-size:13.5px; }
+
+  .foot-note{
+    font-family:var(--mono);
+    font-size:11px;
+    color:#a39c8c;
+    text-align:center;
+    margin-top:30px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <p class="eyebrow">Cloudflare Immerse · Bengaluru</p>
+      <h1>Onsite Registration</h1>
+      <p class="meta">07th August 2026 · ITC Gardenia, Bangalore · Front-desk check-in</p>
+    </div>
+    <div class="count">
+      <div class="num" id="countNum">0</div>
+      <div class="lbl">Registered</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- FORM PANEL -->
+    <div class="panel">
+      <h2>Register attendee</h2>
+      <form id="regForm" novalidate>
+        <div class="field">
+          <label for="fullName">Full Name <span class="req">*</span></label>
+          <input type="text" id="fullName" autocomplete="off">
+          <div class="errmsg" id="err-fullName"></div>
+        </div>
+        <div class="field">
+          <label for="phone">Phone <span class="req">*</span></label>
+          <input type="tel" id="phone" autocomplete="off" placeholder="10-digit mobile number">
+          <div class="errmsg" id="err-phone"></div>
+        </div>
+        <div class="field">
+          <label for="email">Email Address <span class="req">*</span></label>
+          <input type="email" id="email" autocomplete="off" placeholder="name@company.com">
+          <div class="errmsg" id="err-email"></div>
+        </div>
+        <div class="field">
+          <label for="company">Company <span class="req">*</span></label>
+          <input type="text" id="company" autocomplete="off">
+          <div class="errmsg" id="err-company"></div>
+        </div>
+        <div class="field">
+          <label for="jobTitle">Job Title <span class="req">*</span></label>
+          <input type="text" id="jobTitle" autocomplete="off">
+          <div class="errmsg" id="err-jobTitle"></div>
+        </div>
+
+        <div class="btnrow">
+          <button type="submit" class="btn-primary" id="submitBtn">Add to roster</button>
+          <button type="button" class="btn-ghost" id="clearBtn">Clear form</button>
+        </div>
+        <div class="toast" id="toast">✓ <span id="toastMsg">Registered successfully</span></div>
+      </form>
+    </div>
+
+    <!-- ROSTER PANEL -->
+    <div class="panel">
+      <div class="roster-head">
+        <h2>Today's roster</h2>
+        <button class="admin-lock" id="adminLockBtn" title="Admin access required">🔒 Admin</button>
+        <button class="download" id="downloadBtn" style="display:none;" disabled>⭳ Download report (CSV)</button>
+      </div>
+      <input type="text" class="search" id="searchBox" placeholder="Search by name, company, or email…">
+      <div id="rosterBody">
+        <div class="empty" id="emptyState">
+          <div class="big">🗒️</div>
+          <p>No attendees registered yet.<br>Entries you add will appear here.</p>
+        </div>
+        <table id="rosterTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>Attendee</th>
+              <th>Contact</th>
+              <th>Company / Title</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rosterTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="foot-note">Data stays in this browser tab only, never sent to a server · closing or refreshing clears it, so download the report before you do</p>
+</div>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-box">
+    <h3>Admin access</h3>
+    <p>Enter the admin PIN to unlock the CSV report download.</p>
+    <input type="password" id="adminPin" inputmode="numeric" placeholder="••••" maxlength="12">
+    <div class="modal-err" id="adminErr"></div>
+    <div class="modal-btns">
+      <button type="button" class="btn-ghost" id="adminCancel">Cancel</button>
+      <button type="button" class="btn-primary" id="adminUnlock">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASSCODE = '2026'; // change this to your own admin PIN
+let roster = [];
+let isAdmin = false;
+
+const els = {
+  fullName: document.getElementById('fullName'),
+  phone: document.getElementById('phone'),
+  email: document.getElementById('email'),
+  company: document.getElementById('company'),
+  jobTitle: document.getElementById('jobTitle'),
+  form: document.getElementById('regForm'),
+  submitBtn: document.getElementById('submitBtn'),
+  clearBtn: document.getElementById('clearBtn'),
+  toast: document.getElementById('toast'),
+  toastMsg: document.getElementById('toastMsg'),
+  countNum: document.getElementById('countNum'),
+  rosterTbody: document.getElementById('rosterTbody'),
+  rosterTable: document.getElementById('rosterTable'),
+  emptyState: document.getElementById('emptyState'),
+  downloadBtn: document.getElementById('downloadBtn'),
+  searchBox: document.getElementById('searchBox'),
+  adminLockBtn: document.getElementById('adminLockBtn'),
+  adminModal: document.getElementById('adminModal'),
+  adminPin: document.getElementById('adminPin'),
+  adminErr: document.getElementById('adminErr'),
+  adminCancel: document.getElementById('adminCancel'),
+  adminUnlock: document.getElementById('adminUnlock'),
+};
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function validators(){
+  return {
+    fullName: v => v.trim().length >= 2 ? '' : 'Enter the attendee\'s full name.',
+    phone: v => /^[0-9+\-\s]{7,15}$/.test(v.trim()) ? '' : 'Enter a valid phone number.',
+    email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) ? '' : 'Enter a valid email address.',
+    company: v => v.trim().length >= 1 ? '' : 'Enter a company name.',
+    jobTitle: v => v.trim().length >= 1 ? '' : 'Enter a job title.',
+  };
+}
+
+function validateField(key){
+  const val = els[key].value;
+  const msg = validators()[key](val);
+  document.getElementById('err-' + key).textContent = msg;
+  els[key].classList.toggle('err', !!msg);
+  return !msg;
+}
+
+Object.keys(validators()).forEach(key => {
+  els[key].addEventListener('blur', () => validateField(key));
+  els[key].addEventListener('input', () => {
+    if (els[key].classList.contains('err')) validateField(key);
+  });
+});
+
+function renderRoster(){
+  const q = els.searchBox.value.trim().toLowerCase();
+  const filtered = roster.filter(r =>
+    !q || [r.fullName, r.company, r.email, r.jobTitle].some(f => f.toLowerCase().includes(q))
+  );
+
+  els.countNum.textContent = roster.length;
+  if (isAdmin) els.downloadBtn.disabled = roster.length === 0;
+
+  if (roster.length === 0){
+    els.emptyState.style.display = 'block';
+    els.rosterTable.style.display = 'none';
+    els.rosterTbody.innerHTML = '';
+    return;
+  }
+
+  els.emptyState.style.display = 'none';
+  els.rosterTable.style.display = 'table';
+
+  els.rosterTbody.innerHTML = filtered.map(r => `
+    <tr data-id="${r.id}">
+      <td>
+        <div class="name-cell">${esc(r.fullName)}</div>
+        <div class="sub-cell">${esc(r.timestamp)}</div>
+      </td>
+      <td>
+        <div>${esc(r.phone)}</div>
+        <div class="sub-cell">${esc(r.email)}</div>
+      </td>
+      <td>
+        <div>${esc(r.company)}</div>
+        <div class="sub-cell">${esc(r.jobTitle)}</div>
+      </td>
+      <td><button class="del" data-id="${r.id}" title="Remove">✕</button></td>
+    </tr>
+  `).join('');
+
+  els.rosterTbody.querySelectorAll('.del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      roster = roster.filter(r => r.id !== btn.dataset.id);
+      persist();
+      renderRoster();
+    });
+  });
+}
+
+async function persist(){
+  // Intentionally no-op: attendee data is kept in this browser tab's
+  // memory only and is never sent to or stored on any server.
+}
+
+async function loadRoster(){
+  // Nothing to load — each session starts with an empty roster,
+  // since no data is persisted anywhere outside this page.
+  renderRoster();
+}
+
+els.form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const keys = Object.keys(validators());
+  const results = keys.map(validateField);
+  if (!results.every(Boolean)) return;
+
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    fullName: els.fullName.value.trim(),
+    phone: els.phone.value.trim(),
+    email: els.email.value.trim(),
+    company: els.company.value.trim(),
+    jobTitle: els.jobTitle.value.trim(),
+    timestamp: new Date().toLocaleString('en-IN', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'short' }),
+  };
+
+  els.submitBtn.disabled = true;
+  roster.unshift(entry);
+  await persist();
+  renderRoster();
+  els.form.reset();
+  els.toastMsg.textContent = `✓ ${entry.fullName} added to the roster`;
+  els.toast.classList.add('show');
+  setTimeout(() => els.toast.classList.remove('show'), 2500);
+  els.submitBtn.disabled = false;
+  els.fullName.focus();
+});
+
+els.clearBtn.addEventListener('click', () => {
+  els.form.reset();
+  Object.keys(validators()).forEach(key => {
+    document.getElementById('err-' + key).textContent = '';
+    els[key].classList.remove('err');
+  });
+});
+
+els.searchBox.addEventListener('input', renderRoster);
+
+els.downloadBtn.addEventListener('click', () => {
+  const headers = ['Full Name','Phone','Email Address','Company','Job Title','Registered At'];
+  const rows = roster.map(r => [r.fullName, r.phone, r.email, r.company, r.jobTitle, r.timestamp]);
+  const csvEscape = v => `"${String(v).replace(/"/g,'""')}"`;
+  const csv = [headers, ...rows].map(row => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `cf-immerse-bengaluru-registrations-${dateStr}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+function openAdminModal(){
+  els.adminModal.classList.add('show');
+  els.adminPin.value = '';
+  els.adminErr.textContent = '';
+  setTimeout(() => els.adminPin.focus(), 50);
+}
+function closeAdminModal(){
+  els.adminModal.classList.remove('show');
+}
+function tryUnlock(){
+  if (els.adminPin.value === ADMIN_PASSCODE){
+    isAdmin = true;
+    els.adminLockBtn.style.display = 'none';
+    els.downloadBtn.style.display = 'inline-flex';
+    els.downloadBtn.disabled = roster.length === 0;
+    closeAdminModal();
+  } else {
+    els.adminErr.textContent = 'Incorrect PIN. Try again.';
+    els.adminPin.value = '';
+    els.adminPin.focus();
+  }
+}
+
+els.adminLockBtn.addEventListener('click', openAdminModal);
+els.adminCancel.addEventListener('click', closeAdminModal);
+els.adminUnlock.addEventListener('click', tryUnlock);
+els.adminPin.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+els.adminModal.addEventListener('click', (e) => { if (e.target === els.adminModal) closeAdminModal(); });
+
+loadRoster();
+</script>
+</body>
+</html>
