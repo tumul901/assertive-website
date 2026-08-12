@@ -1,0 +1,17 @@
+{
+  "node": {
+    "40b39d3c7b07d0a688719724bdc0304e14b579e451": {
+      "workers": {
+        "app/admin/leads/page": {
+          "moduleId": 87912,
+          "async": true,
+          "codeHash": null
+        }
+      },
+      "filename": "src/app/admin/leads/page.tsx",
+      "exportedName": "$$RSC_SERVER_ACTION_0"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "vmGbqnza2GunE0d4cFCzPUxXiotMPVfqRB6GhejxEmI="
+}
